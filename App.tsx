@@ -1,7 +1,7 @@
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useState} from 'react';
 import Ceva from "./components/Ceva"
-import Popup from "./components/Popup";
+import ModalTask from "./components/Popup";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {defaultTasks} from "./components/defaultTaks";
 import RenderSchedule from "./components/RenderSchedule";
@@ -18,17 +18,19 @@ export default function App() {
     const showPage = () => {
         switch (page) {
             case "today":
-                return <ScrollView>
-                    <Popup activate={isShowingAddTask} onSubmit={(task) => {
+                return <ScrollView snapToStart>
+                    <ModalTask activate={isShowingAddTask} onSubmit={(task) => {
                         const other = [...tasks];
                         other.push(task);
                         setTasks(other);
                         setIsShowAddTask(false);
                     }}/>
-                    <Popup activate={isShowingEditTask} editTask={taskBeginEdited} onSubmit={(task) => {
+                    <ModalTask activate={isShowingEditTask} editTask={taskBeginEdited} onSubmit={() => {
                         setIsShowEditTask(false);
+                        const other = [...tasks];
+                        setTasks(other);
                     }} onDeleteTask={(task) => {
-                        setTasks(tasks.filter(a => a.header !== task.header));
+                        setTasks(tasks.filter(a => JSON.stringify(a) !== JSON.stringify(task)));
                         setIsShowEditTask(false);
                     }}
                     />
@@ -94,13 +96,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
     tasks: {
+        backgroundColor:"#fafafa",
         flex: 1,
         marginLeft: 10,
         marginRight: 10,
     },
     nav: {
         flex: 0.1,
-        backgroundColor: '#f1f1f1',
         flexDirection: "row",
         alignItems: "center",
         paddingLeft: 20,

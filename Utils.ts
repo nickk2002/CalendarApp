@@ -1,4 +1,4 @@
-import dateFormat from "dateformat";
+import dateFormat, {i18n} from "dateformat";
 
 export type time = {
     day: number,
@@ -28,7 +28,7 @@ export function displayTimeToDateFormat(time: time) {
 }
 
 export function createJsDateFromTimeFormat(time: time): Date {
-    return new Date()
+    return new Date(`${time.day} ${time.month} 2022 ${time.hour}:${time.minutes}`)
 }
 
 export function getToday(): time {

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Alert, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {colors} from "../colors";
 import {CalendarItemType} from "./CalendarItem";
@@ -44,19 +44,32 @@ function EventOption(props: { name: string, iconName, disableLine?: boolean }) {
     );
 }
 
+type PopupSettings = {
+
+    onSubmit: (arg0: CalendarItemType) => void,
+    activate: boolean,
+    editTask?: CalendarItemType,
+    onDeleteTask?: (arg0: CalendarItemType) => any
+}
 const palette = ['#000000', '#888888', '#ed1c24', '#d11cd5', '#1633e6', '#00aeef', '#00c85d', '#57ff0a', '#ffde17', '#f26522']
-const Popup = (props: {
-    onSubmit: (arg0: CalendarItemType) => void; activate: boolean, editTask?: CalendarItemType, onDeleteTask?: (arg0: CalendarItemType) => any
-}) => {
+const Popup = (props: PopupSettings) => {
 
     const [taskHeader, setTaskHeader] = useState("");
     const [taskDescription, setTaskDescription] = useState("");
 
     const [isDatePickerVisibleStart, setStartDateVisibility] = useState(false);
     const [isDatePickerVisibleEnd, setDatePickerVisibilityEnd] = useState(false);
-    const [startTime, setStartTime]: [string, any] = useState(Date());
-    const [endTime, setEndTime]: [string, any] = useState(Date());
+    const [startTime, setStartTime]: [string, any] = useState(createJsDateFromTimeFormat(getTodayWithThisHour(10)).toString());
+    const [endTime, setEndTime]: [string, any] = useState(createJsDateFromTimeFormat(getTodayWithThisHour(12)).toString());
     const [taskColor, setTaskColor] = useState("magenta");
+
+    useEffect(() => {
+       if(props.editTask) {
+           setStartTime(createJsDateFromTimeFormat(props.editTask.startTime).toString());
+           setEndTime(createJsDateFromTimeFormat(props.editTask.endTime).toString());
+
+       }
+    })
 
     const [isColorPicking, setColorPicking] = useState(false);
 
@@ -135,6 +148,7 @@ const Popup = (props: {
         >
             <View style={styles.actualView}>
                 <View style={styles.padding}>
+                    {/*Header*/}
                     <View style={styles.header}>
                         <TouchableOpacity
                             onPress={() => setColorPicking(!isColorPicking)}
@@ -155,29 +169,34 @@ const Popup = (props: {
                                        style={{fontWeight: "bold", fontSize: 20, marginLeft: 10}}>
                             </TextInput>
                         }
-                        <View style={{flex: 1, flexDirection: "row-reverse"}}>
-                            <TouchableOpacity onPress={() => {
-                                Alert.alert(
-                                    "Confirm Delete Task " + props.editTask.header,
-                                    "You can't undo this operation",
-                                    [
-                                        {
-                                            text: "Yes",
-                                            onPress: () => {
-                                                props.onDeleteTask(props.editTask);
+                        {
+                            props.editTask ?
+                                <View style={{flex: 1, flexDirection: "row-reverse"}}>
+                                    <TouchableOpacity onPress={() => {
+                                        Alert.alert(
+                                            "Confirm Delete Task " + props.editTask.header,
+                                            "You can't undo this operation",
+                                            [
+                                                {
+                                                    text: "Yes",
+                                                    onPress: () => {
+                                                        props.onDeleteTask(props.editTask);
 
-                                            }
-                                        },
-                                        {
-                                            text: "No",
-                                        }
-                                    ])
-                            }}>
-                                <MaterialIcons name='delete' color={colors.red} size={20}/>
-                            </TouchableOpacity>
-                        </View>
+                                                    }
+                                                },
+                                                {
+                                                    text: "No",
+                                                }
+                                            ])
+                                    }}>
+                                        <MaterialIcons name='delete' color={colors.red} size={20}/>
+                                    </TouchableOpacity>
+                                </View>
+                                : <></>
+                        }
                     </View>
                     <ColorPicker/>
+                    {/*Start Date End Date*/}
                     <View style={{
                         marginTop: 20,
                         flexDirection: "row",
@@ -190,7 +209,7 @@ const Popup = (props: {
                         <DateTimePickerModal
                             isVisible={isDatePickerVisibleStart}
                             mode="datetime"
-                            date={createJsDateFromTimeFormat(getTodayWithThisHour(10))}
+                            date={new Date(startTime)}
                             is24Hour
                             onConfirm={handleConfirmStart}
                             onCancel={() => setStartDateVisibility(false)}
@@ -202,6 +221,7 @@ const Popup = (props: {
                             isVisible={isDatePickerVisibleEnd}
                             mode="datetime"
                             is24Hour
+                            date={new Date(endTime)}
                             onConfirm={handleConfirmEnd}
                             onCancel={() => setDatePickerVisibilityEnd(false)}
                         />
@@ -272,7 +292,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
         flex: 1,
-        top: '35%',
+        top:'35%'
     },
     padding: {
         padding: 20,
