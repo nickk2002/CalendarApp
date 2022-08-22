@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {
     Alert,
     Modal,
+    Pressable,
     StyleSheet,
     Text,
     TextInput,
@@ -20,25 +21,38 @@ import {
     getToday,
     getTodayWithThisHour,
     parseIntoTimeObject,
+    prettyPrintDifferenceDate,
     prettyPrintTime
 } from "../Utils";
 
 import {MaterialIcons} from "@expo/vector-icons"
 import {BlurView} from "expo-blur";
 
-function EventTimeLabels(props) {
+function EventTimeLabels(props: { value: string; label: string; onPress?: () => void; notPressable?: boolean }) {
     return (
-        <TouchableOpacity onPress={() => props?.onPress()} style={{flex: 1, marginRight: 10}}>
+        <View style={{flex: 1, marginRight: 10}}>
             <Text style={{fontSize: 12, fontWeight: "bold"}}>{props.label}</Text>
-            <View style={{
-                borderRadius: 5,
-                backgroundColor: colors.lightgrey,
-                padding: 5,
-                alignItems: 'center',
-            }}>
-                <Text style={{fontSize: 12}}>{props.value}</Text>
-            </View>
-        </TouchableOpacity>
+            {
+                props?.notPressable ?
+                    <Pressable style={{
+                        borderRadius: 5,
+                        backgroundColor: colors.lightgrey,
+                        padding: 5,
+                        alignItems: 'center',
+                    }}>
+                        <Text style={{fontSize: 12}}>{props.value}</Text>
+                    </Pressable>
+                    :
+                    <TouchableOpacity activeOpacity={0.6} onPress={() => props?.onPress()} style={{
+                        borderRadius: 5,
+                        backgroundColor: colors.lightgrey,
+                        padding: 5,
+                        alignItems: 'center',
+                    }}>
+                        <Text style={{fontSize: 12}}>{props.value}</Text>
+                    </TouchableOpacity>
+            }
+        </View>
     )
 }
 
@@ -67,8 +81,12 @@ type PopupSettings = {
 const palette = ['#000000', '#888888', '#ed1c24', '#d11cd5', '#1633e6', '#00aeef', '#00c85d', '#57ff0a', '#ffde17', '#f26522']
 const Popup = (props: PopupSettings) => {
 
-    const [taskHeader, setTaskHeader] = useState("");
+    const [taskHeader, setTaskHeader] = useState("Header");
     const [taskDescription, setTaskDescription] = useState("");
+    const [task] = useState({
+        header: "",
+        description: ""
+    });
 
     const [isDatePickerVisibleStart, setStartDateVisibility] = useState(false);
     const [isDatePickerVisibleEnd, setDatePickerVisibilityEnd] = useState(false);
@@ -81,20 +99,22 @@ const Popup = (props: PopupSettings) => {
             setStartTime(createJsDateFromTimeFormat(props.editTask.startTime).toString());
             setEndTime(createJsDateFromTimeFormat(props.editTask.endTime).toString());
         }
+        task.header = '';
+        task.description = "";
     })
 
     const [isColorPicking, setColorPicking] = useState(false);
 
     function createTask() {
-        const task: CalendarItemType = {
-            header: taskHeader,
-            description: taskDescription,
+        const newtask: CalendarItemType = {
+            header: task.header,
+            description: task.description,
             startTime: parseIntoTimeObject(startTime),
             endTime: parseIntoTimeObject(endTime),
             color: taskColor,
             timeChanged: getToday()
         }
-        props.onSubmit(task);
+        props.onSubmit(newtask);
     }
 
     function pressedOutside() {
@@ -194,9 +214,10 @@ const Popup = (props: PopupSettings) => {
                                 {props.editTask.header}
                             </TextInput>
                             :
-                            <TextInput autoFocus placeholder="New Event"
-                                       onChangeText={(content) => setTaskHeader(content)}
-                                       style={{fontWeight: "bold", fontSize: 20, marginLeft: 10}}>
+                            <TextInput placeholder="New Event"
+                                       onChangeText={(content) => task.header = content}
+                                       style={{fontWeight: "bold", fontSize: 20, flex: 1, marginLeft: 10}}>
+                                {task.header}
                             </TextInput>
                         }
                         {
@@ -255,7 +276,8 @@ const Popup = (props: PopupSettings) => {
                             onConfirm={handleConfirmEnd}
                             onCancel={() => setDatePickerVisibilityEnd(false)}
                         />
-                        <EventTimeLabels label="Duration" value="2 hours"/>
+                        <EventTimeLabels notPressable label="Duration"
+                                         value={prettyPrintDifferenceDate(startTime, endTime)}/>
                     </View>
                 </View>
                 <Text style={{
@@ -279,26 +301,28 @@ const Popup = (props: PopupSettings) => {
                         multiline
                         scrollEnabled
                         maxLength={30}
-                        onChangeText={(text) => setTaskDescription(text)}
-                        placeholder="Description"/>
+                        onChangeText={(text) => task.description = text}
+                        placeholder="Description">
+                        {task.description}
+                    </TextInput>
                 }
                 <View style={{backgroundColor: colors.lightgrey, padding: 10}}/>
                 <EventOption name="Repeat" iconName="repeat"/>
                 <EventOption name="Add Tag" disableLine iconName="add"/>
                 <View style={{backgroundColor: colors.lightgrey, padding: 10}}/>
+
                 <View style={{
                     alignItems: 'center',
-                    margin: 20,
+                    justifyContent: 'space-evenly',
                     flex: 1,
                 }}>
                     <TouchableOpacity
                         style={{
-                            padding: 10,
                             width: 100,
+                            padding: 10,
                             borderRadius: 5,
                             justifyContent: "center",
                             alignItems: "center",
-                            backgroundColor: colors.lightgrey,
                             borderWidth: 0.1
                         }}
                         onPress={() => {
@@ -325,20 +349,22 @@ const Popup = (props: PopupSettings) => {
             transparent
             visible={props.activate}
         >
-            <TouchableWithoutFeedback onPress={pressedOutside}>
+            <View style={{flex: 1}}>
                 <View style={{flex: 1}}>
-                    <View style={{flex: 1}}>
-                        <BlurView
-                            style={styles.absolute}
-                            intensity={80}
-                            tint="dark"
-                        >
-                        </BlurView>
-                        <ActualContent/>
-                    </View>
-                </View>
+                    <BlurView
+                        style={styles.absolute}
+                        intensity={80}
+                        tint="dark"
+                    >
+                    </BlurView>
 
-            </TouchableWithoutFeedback>
+                    <TouchableWithoutFeedback onPress={pressedOutside}>
+                        <View style={{flex: 0.6}}/>
+                    </TouchableWithoutFeedback>
+                    <ActualContent/>
+                </View>
+            </View>
+
         </Modal>
     )
 
@@ -347,16 +373,14 @@ const Popup = (props: PopupSettings) => {
 const styles = StyleSheet.create({
     actualView: {
         backgroundColor: "#FFFFFE",
-        borderWidth: 1,
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
         flex: 1,
-        top: '35%'
     },
     absolute: {
         position: "absolute",
-        width:'100%',
-        height:"100%",
+        width: '100%',
+        height: "100%",
     },
     padding: {
         padding: 20,

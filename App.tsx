@@ -94,9 +94,9 @@ export default function App() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingTop:20,
     },
     tasks: {
-        backgroundColor: "#fafafa",
         flex: 1,
         marginLeft: 10,
         marginRight: 10,

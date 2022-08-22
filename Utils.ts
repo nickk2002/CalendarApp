@@ -37,7 +37,34 @@ export function getToday(): time {
 }
 
 export function prettyPrintTime(time: time) {
-   return  dateFormat(createJsDateFromTimeFormat(time), "d mmm 'At' HH:MM")
+    return dateFormat(createJsDateFromTimeFormat(time), "d mmm 'At' HH:MM")
+}
+
+export function prettyPrintDifferenceDate(time1: string, time2: string) {
+    return prettyPrintDifferenceTime(parseIntoTimeObject(time1), parseIntoTimeObject(time2));
+}
+
+export function prettyPrintDifferenceTime(time1: time, time2: time) {
+    const difMinutes = time2.hour * 60 + time2.minutes - time1.hour * 60 - time1.minutes;
+    if (difMinutes <= 0)
+        return "No duration"
+    // assume only hours/ minutes
+
+
+    const hours = Math.floor(difMinutes / 60);
+    const minutes = difMinutes - hours * 60;
+    console.log("h", hours, "m", minutes);
+    let finalString = "";
+    if (hours > 0) {
+        finalString += hours.toString() + " hour" + (hours > 1 ? "s" : "")
+        console.log(hours + " hour")
+    }
+    if (hours > 0 && minutes > 0)
+        finalString += " "
+    if (minutes > 0)
+        finalString += minutes + " min"
+    console.log("Final s", finalString);
+    return finalString
 }
 
 export const dateFormatString = "d mmm, HH:MM";
