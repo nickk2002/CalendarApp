@@ -1,5 +1,14 @@
 import React, {useEffect, useState} from "react";
-import {Alert, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+    Alert,
+    Modal,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View
+} from "react-native";
 import {colors} from "../colors";
 import {CalendarItemType} from "./CalendarItem";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -8,11 +17,14 @@ import {
     createJsDateFromTimeFormat,
     dateFormatString,
     displayTimeToDateFormat,
+    getToday,
     getTodayWithThisHour,
-    parseIntoTimeObject
+    parseIntoTimeObject,
+    prettyPrintTime
 } from "../Utils";
 
 import {MaterialIcons} from "@expo/vector-icons"
+import {BlurView} from "expo-blur";
 
 function EventTimeLabels(props) {
     return (
@@ -50,6 +62,7 @@ type PopupSettings = {
     activate: boolean,
     editTask?: CalendarItemType,
     onDeleteTask?: (arg0: CalendarItemType) => any
+    onDismiss: () => void;
 }
 const palette = ['#000000', '#888888', '#ed1c24', '#d11cd5', '#1633e6', '#00aeef', '#00c85d', '#57ff0a', '#ffde17', '#f26522']
 const Popup = (props: PopupSettings) => {
@@ -64,11 +77,10 @@ const Popup = (props: PopupSettings) => {
     const [taskColor, setTaskColor] = useState("magenta");
 
     useEffect(() => {
-       if(props.editTask) {
-           setStartTime(createJsDateFromTimeFormat(props.editTask.startTime).toString());
-           setEndTime(createJsDateFromTimeFormat(props.editTask.endTime).toString());
-
-       }
+        if (props.editTask) {
+            setStartTime(createJsDateFromTimeFormat(props.editTask.startTime).toString());
+            setEndTime(createJsDateFromTimeFormat(props.editTask.endTime).toString());
+        }
     })
 
     const [isColorPicking, setColorPicking] = useState(false);
@@ -80,12 +92,19 @@ const Popup = (props: PopupSettings) => {
             startTime: parseIntoTimeObject(startTime),
             endTime: parseIntoTimeObject(endTime),
             color: taskColor,
+            timeChanged: getToday()
         }
         props.onSubmit(task);
     }
 
+    function pressedOutside() {
+        console.log("Pressed outside");
+        props.onDismiss();
+    }
+
     function editTask() {
-        console.log("editing a task!");
+        console.log("editing a task! at", getToday());
+        props.editTask.timeChanged = getToday();
         props.onSubmit(props.editTask);
     }
 
@@ -105,16 +124,25 @@ const Popup = (props: PopupSettings) => {
     const displayInitialEndDate = () => {
         return props.editTask ? displayTimeToDateFormat(props.editTask.endTime) : dateFormat(endTime, dateFormatString);
     }
+    const renderLastEditDate = () => {
+        if (props.editTask && props.editTask.timeChanged) {
+            console.log("min " + props.editTask.timeChanged.minutes)
+            return (<Text style={{
+                padding: 10,
+                color: colors.textgrey
+            }}>
+                Last
+                Changed {prettyPrintTime(props.editTask.timeChanged)} </Text>)
+        }
+
+        return <></>
+    }
 
     function ColorPicker() {
         return (
-            <Modal transparent visible={isColorPicking} animated animationType="fade">
-                <View style={{
-                    flex: 1,
-                    top: '60%',
-                    paddingLeft: 20,
-                    flexDirection: "row",
-                }}>
+            <Modal transparent visible={isColorPicking} animated onDismiss={() => console.log("dismiss")}
+                   animationType="fade">
+                <View style={{flex: 1, top: '65%', flexDirection: "row", marginLeft: 15}}>
                     {palette.map((color) => {
                         return (
                             <TouchableOpacity
@@ -140,12 +168,9 @@ const Popup = (props: PopupSettings) => {
         )
     }
 
-    return (
-        <Modal
-            animationType="slide"
-            transparent
-            visible={props.activate}
-        >
+    function ActualContent() {
+        return (
+
             <View style={styles.actualView}>
                 <View style={styles.padding}>
                     {/*Header*/}
@@ -160,7 +185,12 @@ const Popup = (props: PopupSettings) => {
                             }}/>
                         {props.editTask ?
                             <TextInput onChangeText={(content) => props.editTask.header = content}
-                                       style={{fontWeight: "bold", fontSize: 20, marginLeft: 10}}>
+                                       style={{
+                                           fontWeight: "bold",
+                                           fontSize: 20,
+                                           marginLeft: 10,
+                                           flex: 1,
+                                       }}>
                                 {props.editTask.header}
                             </TextInput>
                             :
@@ -171,7 +201,7 @@ const Popup = (props: PopupSettings) => {
                         }
                         {
                             props.editTask ?
-                                <View style={{flex: 1, flexDirection: "row-reverse"}}>
+                                <View style={{flex: 0.1, flexDirection: "row-reverse"}}>
                                     <TouchableOpacity onPress={() => {
                                         Alert.alert(
                                             "Confirm Delete Task " + props.editTask.header,
@@ -279,10 +309,39 @@ const Popup = (props: PopupSettings) => {
                         }}>
                         <Text style={{color: 'black'}}>{props.editTask ? "Update Task" : "Add Task"}</Text>
                     </TouchableOpacity>
+                    {
+                        renderLastEditDate()
+                    }
                 </View>
             </View>
+        )
+    }
+
+    // END
+    return (
+        <Modal
+            animated
+            animationType="fade"
+            transparent
+            visible={props.activate}
+        >
+            <TouchableWithoutFeedback onPress={pressedOutside}>
+                <View style={{flex: 1}}>
+                    <View style={{flex: 1}}>
+                        <BlurView
+                            style={styles.absolute}
+                            intensity={80}
+                            tint="dark"
+                        >
+                        </BlurView>
+                        <ActualContent/>
+                    </View>
+                </View>
+
+            </TouchableWithoutFeedback>
         </Modal>
-    );
+    )
+
 };
 
 const styles = StyleSheet.create({
@@ -292,7 +351,12 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
         flex: 1,
-        top:'35%'
+        top: '35%'
+    },
+    absolute: {
+        position: "absolute",
+        width:'100%',
+        height:"100%",
     },
     padding: {
         padding: 20,

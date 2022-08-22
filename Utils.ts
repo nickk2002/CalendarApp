@@ -1,4 +1,4 @@
-import dateFormat, {i18n} from "dateformat";
+import dateFormat from "dateformat";
 
 export type time = {
     day: number,
@@ -34,6 +34,10 @@ export function createJsDateFromTimeFormat(time: time): Date {
 export function getToday(): time {
     const now = Date();
     return parseIntoTimeObject(now);
+}
+
+export function prettyPrintTime(time: time) {
+   return  dateFormat(createJsDateFromTimeFormat(time), "d mmm 'At' HH:MM")
 }
 
 export const dateFormatString = "d mmm, HH:MM";

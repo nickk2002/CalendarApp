@@ -24,7 +24,8 @@ export default function App() {
                         other.push(task);
                         setTasks(other);
                         setIsShowAddTask(false);
-                    }}/>
+                    }} onDismiss={() => setIsShowAddTask(false)}/>
+
                     <ModalTask activate={isShowingEditTask} editTask={taskBeginEdited} onSubmit={() => {
                         setIsShowEditTask(false);
                         const other = [...tasks];
@@ -32,7 +33,7 @@ export default function App() {
                     }} onDeleteTask={(task) => {
                         setTasks(tasks.filter(a => JSON.stringify(a) !== JSON.stringify(task)));
                         setIsShowEditTask(false);
-                    }}
+                    }} onDismiss={() => setIsShowEditTask(false)}
                     />
                     <RenderSchedule givenTasks={tasks}
                                     callbackTaskPressed={(task) => {
@@ -93,10 +94,9 @@ export default function App() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
     },
     tasks: {
-        backgroundColor:"#fafafa",
+        backgroundColor: "#fafafa",
         flex: 1,
         marginLeft: 10,
         marginRight: 10,
