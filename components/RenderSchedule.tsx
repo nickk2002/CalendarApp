@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from "react-native";
+import { StyleSheet, View} from "react-native";
 import {
     compareTime,
     formatHourTime,
@@ -11,11 +11,12 @@ import {
 import {colors} from "../colors";
 import React, {useEffect, useState} from "react";
 import CalendarItem, {CalendarItemType} from "./CalendarItem";
-
+import {MyText} from "./Ceva";
 
 const timeHeight = 100;
 const spaceBetween = 2;
 const initialTimeHour = 7;
+
 
 interface Schedule {
     givenTasks: CalendarItemType[],
@@ -107,7 +108,7 @@ export default function RenderSchedule(props: Schedule) {
                             flexDirection: "row",
                             alignItems: "center"
                         }}>
-                        <Text style={styles.time}>{formatHourTime(hour)} </Text>
+                        <MyText style={styles.time}>{formatHourTime(hour)} </MyText>
                         <View style={{width: 10, height: 1, backgroundColor: colors.textgrey}}/>
                     </View>
                 </View>
@@ -127,7 +128,7 @@ export default function RenderSchedule(props: Schedule) {
                 {/*            flexDirection: "row",*/}
                 {/*            alignItems: "center"*/}
                 {/*        }}>*/}
-                {/*        <Text style={[styles.time, {color: colors.red}]}>{formatHourTime(currentHour)} </Text>*/}
+                {/*        <MyText style={[styles.time, {color: colors.red}]}>{formatHourTime(currentHour)} </MyText>*/}
                 {/*        <View style={{width: 10, height: 1.2, backgroundColor: colors.red}}/>*/}
                 {/*    </View>*/}
                 {/*</View>*/}
@@ -137,7 +138,8 @@ export default function RenderSchedule(props: Schedule) {
 
     return (
         <View>
-            <Text style={{fontSize: 25, fontWeight: "bold", textAlign: "center"}}>Today, {getTodayDayMonth()}</Text>
+            <MyText
+                style={{fontSize: 25, fontWeight: "bold", textAlign: "center"}}>Today, {getTodayDayMonth()}</MyText>
             <View style={{flex: 1, flexDirection: 'row', marginTop: 20, marginLeft: 5}}>
                 {renderTime()}
                 <View style={{flex: 1}}>

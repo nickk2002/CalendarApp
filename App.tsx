@@ -1,10 +1,15 @@
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useState} from 'react';
-import Ceva from "./components/Ceva"
-import ModalTask from "./components/Popup";
+import {Platform, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import Ceva, {MyText} from "./components/Ceva"
+import ModalTask from "./components/TaskPopup/Popup";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {defaultTasks} from "./components/defaultTaks";
 import RenderSchedule from "./components/RenderSchedule";
+
+import * as Notifications from "expo-notifications";
+import {themeHook} from "./components/theme";
+import Profile from "./components/Profile";
+import UselessTextInput from "./components/UselessTextInput";
 
 
 export default function App() {
@@ -13,8 +18,9 @@ export default function App() {
     const [isShowingAddTask, setIsShowAddTask] = useState(false);
     const [isShowingEditTask, setIsShowEditTask] = useState(false);
     const [taskBeginEdited, setTaskBeingEdited] = useState(null);
-
+    const [theme] = themeHook();
     const [tasks, setTasks] = useState(defaultTasks);
+
     const showPage = () => {
         switch (page) {
             case "today":
@@ -44,75 +50,80 @@ export default function App() {
             case "Ceva":
                 return <Ceva/>
             case "calendar":
-                return <Text>Calendar</Text>
+                return <UselessTextInput/>
+            case "profile":
+                return <Profile/>
         }
     }
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            paddingTop: 20,
+            backgroundColor: theme === 'white' ? 'white' : 'black',
+        },
+        realContainer: {
+            flex: 1,
+            backgroundColor: theme === 'white' ? 'white' : 'black',
+            paddingLeft: 10,
+            paddingRight: 10,
+        },
+        nav: {
+            flex: 0.1,
+            flexDirection: "row",
+            alignItems: "center",
+            paddingLeft: 20,
+            backgroundColor: theme === 'white' ? '#FFFFFF' : '#313131',
+        },
+        navitem: {
+            color: 'black',
+            fontSize: 15,
+            height: "100%",
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+        }
+    });
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.tasks}>
+            <View style={styles.realContainer}>
                 {showPage()}
             </View>
             <View style={styles.nav}>
                 <TouchableOpacity onPress={() => setPage("today")}
-                                  style={styles.navitem}><Text>Today</Text></TouchableOpacity>
+                                  style={styles.navitem}><MyText>Today</MyText></TouchableOpacity>
                 <TouchableOpacity onPress={() => setPage("Ceva")}
-                                  style={styles.navitem}><Text>Ceva</Text></TouchableOpacity>
+                                  style={styles.navitem}><MyText>Ceva</MyText></TouchableOpacity>
                 <TouchableOpacity onPress={() => setIsShowAddTask(true)} style={styles.navitem}>
                     <View style={{
                         width: 40,
                         height: 40,
                         borderRadius: 100,
                         borderWidth: 2.5,
-                        borderColor: "#5B5B5B",
+                        borderColor: theme == 'white' ? "#5B5B5B" : "#999999",
                         justifyContent: "center",
                         alignItems: "center"
                     }}>
                         <View style={{
                             width: '50%',
                             height: 2,
-                            backgroundColor: '#000000',
+                            backgroundColor: theme === 'white' ? 'black' : 'white',
                             position: "absolute"
                         }}/>
                         <View style={{
                             height: '50%',
                             width: 2,
-                            backgroundColor: '#000000',
+                            backgroundColor: theme === 'white' ? 'black' : 'white',
                             position: "absolute"
                         }}/>
                     </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setPage("calendar")}
-                                  style={styles.navitem}><Text>Calendar</Text></TouchableOpacity>
+                                  style={styles.navitem}><MyText>Calendar</MyText></TouchableOpacity>
                 <TouchableOpacity onPress={() => setPage("profile")}
-                                  style={styles.navitem}><Text>Profile</Text></TouchableOpacity>
+                                  style={styles.navitem}><MyText>Profile</MyText></TouchableOpacity>
             </View>
         </SafeAreaView>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        paddingTop:20,
-    },
-    tasks: {
-        flex: 1,
-        marginLeft: 10,
-        marginRight: 10,
-    },
-    nav: {
-        flex: 0.1,
-        flexDirection: "row",
-        alignItems: "center",
-        paddingLeft: 20,
-    },
-    navitem: {
-        color: 'black',
-        fontSize: 15,
-        height: "100%",
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    }
-});
