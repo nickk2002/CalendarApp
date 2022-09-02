@@ -22,7 +22,7 @@ import {CalendarItemType} from "../Schedule/CalendarItem";
 import {PopupSettings} from "./Popup";
 import EventTimeLabels from "./EventTimeLabels";
 import EventOption from "./EventOptions";
-import ColorPicker from "./ColorPicker";
+import ColorPicker, {randomColor} from "./ColorPicker";
 import {DeleteButton} from "./DeleteButton";
 import {navigateBack} from "../../RootNavigation";
 
@@ -40,7 +40,7 @@ export default function ActualContent(props: PopupSettings) {
     const [startTime, setStartTime]: [string, any] = useState(createJsDateFromTimeFormat(getTimeWithThisHour(getCalendarDay, 10)).toString());
     const [endTime, setEndTime]: [string, any] = useState(createJsDateFromTimeFormat(getTimeWithThisHour(getCalendarDay, 11)).toString());
 
-    const [taskColor, setTaskColor] = useState("magenta");
+    const [taskColor, setTaskColor] = useState(randomColor());
     const [isColorPicking, setColorPicking] = useState(false);
 
     const backgroundColor = () => {
@@ -53,13 +53,12 @@ export default function ActualContent(props: PopupSettings) {
             return 'grey'
         return '#a7a7a7'
     }
-    useEffect(()=>{
-       if(props.startTime){
-           console.log("Has start Time");
-           setStartTime(createJsDateFromTimeFormat(props.startTime));
-           setEndTime(createJsDateFromTimeFormat(props.endTime));
-       }
-    },[])
+    useEffect(() => {
+        if (props.startTime) {
+            setStartTime(createJsDateFromTimeFormat(props.startTime));
+            setEndTime(createJsDateFromTimeFormat(props.endTime));
+        }
+    }, [])
     useEffect(() => {
         if (props.editTask) {
             setStartTime(createJsDateFromTimeFormat(props.editTask.startTime).toString());
@@ -213,10 +212,13 @@ export default function ActualContent(props: PopupSettings) {
                         }}
                     />
 
-                    <EventTimeLabels onPress={() => {
-                        if (props.editTask?.isFromCalendar || props.editTask == null)
-                            setDatePickerVisibilityEnd(true);
-                    }} label="Ends" value={displayInitialEndDate()}/>
+                    <EventTimeLabels
+                        onPress={() => {
+                            if (!props.editTask?.isFromCalendar || props.editTask === null)
+                                setDatePickerVisibilityEnd(true);
+                        }}
+                        label="Ends"
+                        value={displayInitialEndDate()}/>
                     <DateTimePickerModal
                         isVisible={isDatePickerVisibleEnd}
                         mode="time"

@@ -3,6 +3,10 @@ import React from "react";
 
 const palette = ['#888888', '#ed1c24', '#d11cd5', '#1633e6', '#00aeef', '#00c85d', '#57ff0a', '#ffde17', '#f26522']
 
+export function randomColor() {
+    return palette[Math.floor(Math.random() * palette.length)];
+}
+
 export default function ColorPicker(props: { isVisible, onPressColor: (arg0: string) => void }) {
     return (
         <Modal transparent visible={props.isVisible} animated onDismiss={() => console.log("dismiss")}
