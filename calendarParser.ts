@@ -51,7 +51,12 @@ function parseLines(lines: string[]): CalendarItemType[] {
         if (location.length > 0) {
             if (line.includes(":")) {
                 location = location.replace(new RegExp("\\\\", "g"), " ")
-                location = removeFromLocation(location, ["EEMCS", "(^-| -)", "Lecture Hall", "Auditorium", ""])
+                location = removeFromLocation(location, ["EEMCS", "(^-| -)", "Lecture Hall", "Auditorium", "- A"])
+                location = location.replace(new RegExp("-?\\([./\\w]+\\),?", "g"), "");
+                location = location.replace(new RegExp("Aula-", "g"), "Aula")
+                location = location.replace(new RegExp(" ,", "g"), ",")
+                location = location.replace(new RegExp("Drebbelweg", "g"), "DW")
+
                 event.location = location.trim();
                 location = "";
             } else {
@@ -70,12 +75,19 @@ function parseLines(lines: string[]): CalendarItemType[] {
             if (!title.includes("-")) {
                 event.header = title;
             } else {
-                event.header = title.split("-")[1].trim();
-                event.course = title.split("-")[0].trim();
-                const re = RegExp("[0-9]+");
-                if (!re.test(event.course)) {
-                    event.header = title;
-                    event.course = "";
+                const splitter = title.split("-")
+                event.header = splitter[1].trim();
+                event.course = splitter[0].trim();
+                if (splitter.length == 3) {
+                    event.course = splitter[2].trim()
+                    console.log(event.header)
+                    console.log("Course name is:", splitter[2])
+                } else {
+                    const re = RegExp("[0-9]+");
+                    if (!re.test(event.course)) {
+                        event.header = title;
+                        event.course = "";
+                    }
                 }
             }
         } else if (line.includes("DESCRIPTION")) {
@@ -85,6 +97,10 @@ function parseLines(lines: string[]): CalendarItemType[] {
         } else if (lines[i].includes('END:VEVENT')) {
             event.isFromCalendar = true;
             event.color = 'red';
+            const re = RegExp("[0-9]+");
+            if (!re.test(event.course)) {
+                event.color = 'yellow' // exam color
+            }
             events[eventIndex] = event;
             event = null;
             eventIndex++;
