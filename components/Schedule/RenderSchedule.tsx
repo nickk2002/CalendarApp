@@ -48,7 +48,6 @@ export default function RenderSchedule() {
         setTasks(filtered);
     }
     useEffect(sortAndFilterTasks, [givenTasks, currentDate]);
-    const windowHeight = Dimensions.get('window').height;
     const renderTasks = (timeHeight: number, spaceBetween: number) => {
         const toRender = [];
         let previousHour: Time = getTimeWithThisHour(currentDate, initialTimeHour);
@@ -135,7 +134,6 @@ export default function RenderSchedule() {
                 </View>
             );
         });
-        const currentHour: Time = getToday();
         return (
             <View style={{marginRight: 5, marginTop: -10}}>
                 {timestamps}
@@ -158,9 +156,9 @@ export default function RenderSchedule() {
     }
 
     return (
-        <ScrollView>
+        <View>
             <View style={{margin: 5, marginTop: 10}}>
-                <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+                <View style={{flexDirection: 'row', alignSelf: 'center',marginBottom:10}}>
 
                     <TouchableOpacity onPress={() => {
                         const jsDate = createJsDateFromTimeFormat(currentDate);
@@ -185,29 +183,31 @@ export default function RenderSchedule() {
                         <AntDesign name="arrowright" size={24} color={theme == 'white' ? 'black' : colors.textgrey}/>
                     </TouchableOpacity>
                 </View>
-                {
-                    tasks.length > 0 ?
+                <ScrollView>
+                    {
+                        tasks.length > 0 ?
 
-                        <View style={{flex: 1, flexDirection: 'row', marginTop: 20, marginLeft: 5}}>
-                            {renderTime()}
-                            <View style={{flex: 1}}>
-                                {renderTasks(timeHeight, spaceBetween)}
+                            <View style={{flex: 1, flexDirection: 'row', marginTop: 20, marginLeft: 5}}>
+                                {renderTime()}
+                                <View style={{flex: 1}}>
+                                    {renderTasks(timeHeight, spaceBetween)}
+                                </View>
                             </View>
-                        </View>
-                        :
-                        <View style={{
-                            height: '100%',
-                            width: '100%',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                        }}>
-                            <MyText style={{fontSize: 20}}>No Tasks Today!</MyText>
-                            <Ionicons style={{marginTop: 10}} name="ios-checkmark-sharp" size={32}
-                                      color={theme == 'white' ? 'black' : 'grey'}/>
-                        </View>
-                }
+                            :
+                            <View style={{
+                                height: '100%',
+                                width: '100%',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <MyText style={{fontSize: 20}}>No Tasks Today!</MyText>
+                                <Ionicons style={{marginTop: 10}} name="ios-checkmark-sharp" size={32}
+                                          color={theme == 'white' ? 'black' : 'grey'}/>
+                            </View>
+                    }
+                </ScrollView>
             </View>
-        </ScrollView>
+        </View>
     );
 }
 
