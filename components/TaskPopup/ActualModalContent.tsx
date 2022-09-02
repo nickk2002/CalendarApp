@@ -1,4 +1,5 @@
 import {StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import DateTimePicker from "react-native-modal-datetime-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import dateFormat from "dateformat";
@@ -6,8 +7,8 @@ import {
     createJsDateFromTimeFormat,
     dateFormatString,
     displayTimeToDateFormat,
+    getTimeWithThisHour,
     getToday,
-    getTodayWithThisHour,
     parseIntoTimeObject,
     prettyPrintDifferenceDate,
     prettyPrintTime
@@ -15,14 +16,15 @@ import {
 
 import {MyText} from "../Ceva";
 import React, {useEffect, useState} from "react";
-import {themeHook} from "../theme";
+import {calendarDayHook, taskHook, themeHook} from "../theme";
 import {colors} from "../../colors";
-import {CalendarItemType} from "../CalendarItem";
+import {CalendarItemType} from "../Schedule/CalendarItem";
 import {PopupSettings} from "./Popup";
 import EventTimeLabels from "./EventTimeLabels";
 import EventOption from "./EventOptions";
 import ColorPicker from "./ColorPicker";
 import {DeleteButton} from "./DeleteButton";
+import {navigateBack} from "../../RootNavigation";
 
 
 export default function ActualContent(props: PopupSettings) {
@@ -30,11 +32,13 @@ export default function ActualContent(props: PopupSettings) {
     const [taskDescription, setTaskDescription] = useState("");
 
     const [theme] = themeHook();
+    const [tasks, setTasks] = taskHook();
+    const [getCalendarDay] = calendarDayHook();
 
     const [isDatePickerVisibleStart, setStartDateVisibility] = useState(false);
     const [isDatePickerVisibleEnd, setDatePickerVisibilityEnd] = useState(false);
-    const [startTime, setStartTime]: [string, any] = useState(createJsDateFromTimeFormat(getTodayWithThisHour(10)).toString());
-    const [endTime, setEndTime]: [string, any] = useState(createJsDateFromTimeFormat(getTodayWithThisHour(12)).toString());
+    const [startTime, setStartTime]: [string, any] = useState(createJsDateFromTimeFormat(getTimeWithThisHour(getCalendarDay, 10)).toString());
+    const [endTime, setEndTime]: [string, any] = useState(createJsDateFromTimeFormat(getTimeWithThisHour(getCalendarDay, 11)).toString());
 
     const [taskColor, setTaskColor] = useState("magenta");
     const [isColorPicking, setColorPicking] = useState(false);
@@ -49,6 +53,13 @@ export default function ActualContent(props: PopupSettings) {
             return 'grey'
         return '#a7a7a7'
     }
+    useEffect(()=>{
+       if(props.startTime){
+           console.log("Has start Time");
+           setStartTime(createJsDateFromTimeFormat(props.startTime));
+           setEndTime(createJsDateFromTimeFormat(props.endTime));
+       }
+    },[])
     useEffect(() => {
         if (props.editTask) {
             setStartTime(createJsDateFromTimeFormat(props.editTask.startTime).toString());
@@ -58,7 +69,7 @@ export default function ActualContent(props: PopupSettings) {
 
 
     function createTask() {
-        const newtask: CalendarItemType = {
+        const newTask: CalendarItemType = {
             header: taskHeader,
             description: taskDescription,
             startTime: parseIntoTimeObject(startTime),
@@ -66,19 +77,25 @@ export default function ActualContent(props: PopupSettings) {
             color: taskColor,
             timeChanged: getToday()
         }
-        props.onSubmit(newtask);
+        console.log("Add task");
+
+        const copy = [...tasks];
+        copy.push(newTask);
+        setTasks(copy);
     }
 
 
     function editTask() {
-        console.log("editing a task! at", getToday());
         props.editTask.timeChanged = getToday();
-        props.onSubmit(props.editTask);
+        console.log(props.editTask)
+        const other = [...tasks];
+        setTasks(other);
     }
 
     function renderHeader() {
         return (props.editTask ?
                 <TextInput
+                    editable={!props.editTask?.isFromCalendar}
                     onChangeText={(content) => props.editTask.header = content}
                     style={[styles.headerTextInput, {color: backgroundColor()}]}>
                     {props.editTask.header}
@@ -118,7 +135,6 @@ export default function ActualContent(props: PopupSettings) {
 
     const renderLastEditDate = () => {
         if (props.editTask && props.editTask.timeChanged) {
-            console.log("min " + props.editTask.timeChanged.minutes)
             return (<MyText style={{
                 padding: 10,
                 color: colors.textgrey
@@ -129,13 +145,13 @@ export default function ActualContent(props: PopupSettings) {
         return <></>
     }
 
-    function handleConfirmStart(date: Date) {
+    function handleConfirmStart(date) {
         props.editTask ? props.editTask.startTime = parseIntoTimeObject(date) : setStartTime(date);
         setStartDateVisibility(false);
     }
 
     function handleConfirmEnd(date: Date) {
-        props.editTask ? props.editTask.endTime = parseIntoTimeObject(date) : setStartTime(date);
+        props.editTask ? props.editTask.endTime = parseIntoTimeObject(date) : setEndTime(date);
         setDatePickerVisibilityEnd(false);
     }
 
@@ -160,8 +176,11 @@ export default function ActualContent(props: PopupSettings) {
                         }}/>
                     {renderHeader()}
                     <DeleteButton isVisible={props.editTask != undefined}
-                                  onDelete={() => props.onDeleteTask(props.editTask)}
-                                  message={"Confirm delete " + props.editTask.header}/>
+                                  onDelete={() => {
+                                      setTasks(tasks.filter(t => JSON.stringify(t) !== JSON.stringify(props.editTask)));
+                                      navigateBack();
+                                  }}
+                                  message={"Confirm delete " + props.editTask?.header}/>
                 </View>
                 <ColorPicker isVisible={isColorPicking} onPressColor={(color) => {
                     if (props.editTask)
@@ -177,26 +196,30 @@ export default function ActualContent(props: PopupSettings) {
                     justifyContent: 'space-around'
                 }}>
                     <EventTimeLabels
-                        onPress={() => setStartDateVisibility(true)}
+                        onPress={() => {
+                            if (!props.editTask?.isFromCalendar || props.editTask === null)
+                                setStartDateVisibility(true);
+                        }}
                         label="Starts"
                         value={displayInitialStartDate()}/>
-                    <DateTimePickerModal
+                    <DateTimePicker
                         isVisible={isDatePickerVisibleStart}
-                        mode="datetime"
-                        isDarkModeEnabled={true}
-                        date={new Date(startTime)}
                         is24Hour
+                        mode="time"
+                        date={new Date(startTime)}
                         onConfirm={handleConfirmStart}
                         onCancel={() => {
                             setStartDateVisibility(false);
                         }}
                     />
 
-                    <EventTimeLabels onPress={() => setDatePickerVisibilityEnd(true)} label="Ends"
-                                     value={displayInitialEndDate()}/>
+                    <EventTimeLabels onPress={() => {
+                        if (props.editTask?.isFromCalendar || props.editTask == null)
+                            setDatePickerVisibilityEnd(true);
+                    }} label="Ends" value={displayInitialEndDate()}/>
                     <DateTimePickerModal
                         isVisible={isDatePickerVisibleEnd}
-                        mode="datetime"
+                        mode="time"
                         is24Hour
                         date={new Date(endTime)}
                         onConfirm={handleConfirmEnd}
@@ -241,6 +264,7 @@ export default function ActualContent(props: PopupSettings) {
                             createTask();
                         else
                             editTask();
+                        navigateBack();
                     }}>
                     <MyText>{props.editTask ? "Update Task" : "Add Task"}</MyText>
                 </TouchableOpacity>

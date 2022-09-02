@@ -7,9 +7,11 @@ function Header(props) {
 }
 
 
-export function MyText(props: { style?, children, }) {
+export function MyText(props: { style?, children, show? }) {
     const [theme] = themeHook();
     const defaultColor = theme === 'white' ? 'black' : 'white';
+    if ('show' in props && !props.show)
+        return <></>
     return <Text {...props} style={[{color: defaultColor}, props.style]}>{props.children}</Text>
 }
 
@@ -42,7 +44,7 @@ function NumberedList(props) {
 
 export default function Dumnezeu() {
     return (
-        <ScrollView style={{paddingLeft: 5, paddingRight: 5}}>
+        <ScrollView style={{ marginRight: 10, marginLeft: 10,marginTop:10}}>
             <View style={styles.rugaciunea}>
                 <MyText style={{fontSize: 16}}><MyText style={{fontWeight: "bold"}}>Doamne, </MyText>Iisuse Hristoase,
                     Fiul

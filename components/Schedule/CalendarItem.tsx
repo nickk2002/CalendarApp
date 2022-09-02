@@ -1,10 +1,10 @@
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import React from "react";
-import {colors} from "../colors";
+import {colors} from "../../colors";
 import HourIntervalDisplay, {TimeInterval} from "./HourIntervalDisplay";
-import {time} from "../Utils";
-import {MyText} from "./Ceva";
-import {themeHook} from "./theme";
+import {Time} from "../../Utils";
+import {MyText} from "../Ceva";
+import {themeHook} from "../theme";
 
 export interface CalendarItemType extends TimeInterval {
     color?: string;
@@ -12,7 +12,11 @@ export interface CalendarItemType extends TimeInterval {
     description?: string;
     isFreeTime?: boolean;
     handlePress?: () => void;
-    timeChanged?: time,
+    timeChanged?: Time,
+
+    location?: string;
+    course?: string;
+    isFromCalendar?: boolean;
 }
 
 function RenderLine(props: { color: string }) {
@@ -49,6 +53,9 @@ export default function CalendarItem(props: CalendarItemType) {
             borderRadius: 10,
             justifyContent: 'center',
         },
+        course: {
+            fontWeight: "bold"
+        },
         header: {
             fontSize: 18,
             fontWeight: 'bold',
@@ -61,7 +68,7 @@ export default function CalendarItem(props: CalendarItemType) {
     });
     if (props.isFreeTime) {
         return (
-            <View style={styles.containerFreeTime}>
+            <TouchableOpacity activeOpacity={0.7} onPress={() => props.handlePress()} style={styles.containerFreeTime}>
                 <RenderLine color="green"/>
                 <View style={{padding: 15, flex: 1}}>
                     <MyText style={styles.header}>Free</MyText>
@@ -81,7 +88,7 @@ export default function CalendarItem(props: CalendarItemType) {
                     {/*}}> University*/}
                     {/*</MyText>*/}
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     }
     return (
@@ -89,7 +96,9 @@ export default function CalendarItem(props: CalendarItemType) {
             <RenderLine color={props.color}/>
             <View style={{margin: 15, flex: 1, overflow: 'hidden'}}>
                 <MyText style={styles.header}>{props.header}</MyText>
-                <MyText style={styles.description}>{props.description}</MyText>
+                <MyText show={props.course} style={[styles.description, styles.course]}>{props.course}</MyText>
+                <MyText show={props.location} style={styles.description}>{props.location}</MyText>
+                <MyText style={styles.description}>{props.description?.trim()}</MyText>
             </View>
             <HourIntervalDisplay startTime={props.startTime} endTime={props.endTime}/>
         </TouchableOpacity>

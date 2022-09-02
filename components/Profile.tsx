@@ -3,18 +3,20 @@ import React, {useState} from "react";
 import {MyText} from "./Ceva";
 import {themeHook} from "./theme";
 import {Entypo, Ionicons} from "@expo/vector-icons";
+import {colors} from "../colors";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-function ViewFunction(props: { icon, text: string }) {
-    const [pressed, setPressed] = useState(false);
+function ViewFunction(props: { icon, text: string, enable: boolean, onPress: () => void }) {
+    const [theme] = themeHook();
     return (
-        <Pressable style={styles.themeOption} onPress={() => setPressed(!pressed)}>
+        <Pressable style={styles.themeOption} onPress={() => {
+            props.onPress();
+        }}>
             {props.icon}
             <MyText style={styles.themeText}>{props.text}</MyText>
-            <View style={styles.pressable}>
-                {pressed ?
-                    <View style={styles.selected}>
-
-                    </View> :
+            <View style={[styles.pressable, {borderColor: theme === 'white' ? '#484848' : "#a7a7a7"}]}>
+                {props.enable ?
+                    <View style={[styles.selected, {backgroundColor: theme === 'white' ? '#4f4f4f' : "#cacaca"}]}/> :
                     <></>
                 }
             </View
@@ -23,51 +25,53 @@ function ViewFunction(props: { icon, text: string }) {
     )
 }
 
-function Seperator() {
-    return (
-        <View style={styles.separator}/>
-    )
-}
 
 export default function Profile() {
-    const [useDarkTheme, setUseDarkTheme] = useState(false);
     const [theme, setTheme] = themeHook();
-    const toggleSwitch = () => {
-        setUseDarkTheme(!useDarkTheme);
-        if (theme === 'white')
-            setTheme('dark');
-        else {
-            setTheme('white');
-        }
+    const [useLight, setUseLight] = useState(theme === 'white');
+    const [useDark, setUseDark] = useState(theme === 'dark');
+    const iconColor = () => {
+        return theme === 'white' ? 'black' : 'grey';
     }
+
     return (
-        <View>
-            <MyText style={{fontSize: 15, marginBottom: 15}}>Theme</MyText>
-            <View style={styles.themeView}>
-                <ViewFunction icon={<Entypo name="light-up" size={20} color="grey"/>} text="Light"/>
-                <Seperator/>
-                <ViewFunction icon={<Ionicons name="moon" size={20} color='grey'/>} text="Dark"/>
+        <SafeAreaView style={{marginHorizontal:10}}>
+            <MyText style={{fontSize: 15, marginBottom: 15}}>Choose Theme</MyText>
+            <View style={{
+                backgroundColor: theme === 'white' ? colors.lightgrey : colors.otherblack,
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: theme === 'white' ? '#c7c7c7' : '#6b6b6b'
+            }}>
+                <ViewFunction icon={<Entypo name="light-up" size={20} color={iconColor()}/>} text="Light"
+                              enable={useLight}
+                              onPress={() => {
+                                  setTheme("white");
+                                  setUseDark(false);
+                                  setUseLight(true);
+                              }}/>
+                <View style={{height: 1, backgroundColor: theme == 'white' ? '#c7c7c7' : '#6b6b6b', width: '100%'}}/>
+                <ViewFunction icon={<Ionicons name="moon" size={20} color={iconColor()}/>} text="Dark" enable={useDark}
+                              onPress={() => {
+                                  console.log("Using Dark mode");
+                                  setTheme("dark");
+                                  setUseLight(false);
+                                  setUseDark(true);
+                              }}
+                />
             </View>
-        </View>
+        </SafeAreaView>
     )
 }
 const styles = StyleSheet.create({
-
-    themeView: {
-        borderWidth: 1,
-        borderColor: 'grey',
-        backgroundColor: '#161B21'
-    },
     themeOption: {
-        borderWidth: 1,
         flexDirection: "row",
         alignItems: 'center',
         padding: 10,
     },
     themeText: {
-        fontSize: 20,
+        fontSize: 15,
         marginLeft: 10,
-        color: "#D6DDE5"
     },
     pressable: {
         position: "absolute",
@@ -76,18 +80,10 @@ const styles = StyleSheet.create({
         width: 20,
         borderRadius: 50,
         borderWidth: 1,
-        borderColor: "#D6DDE5"
     },
     selected: {
         margin: 2,
         borderRadius: 50,
         flex: 1,
-        backgroundColor: "white"
-    },
-    separator: {
-        width: '100%',
-        borderColor: 'red',
-        height: 2,
-        backgroundColor: 'grey'
     }
 })

@@ -1,4 +1,4 @@
-import {CalendarItemType} from "./CalendarItem";
+import {CalendarItemType} from "./Schedule/CalendarItem";
 import {getTodayWithThisHour, getTodayWithThisHourMinutes} from "../Utils";
 
 export const defaultTasks: CalendarItemType[] = [

@@ -1,67 +1,48 @@
-import {Platform, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ceva, {MyText} from "./components/Ceva"
-import ModalTask from "./components/TaskPopup/Popup";
-import {SafeAreaView} from "react-native-safe-area-context";
-import {defaultTasks} from "./components/defaultTaks";
-import RenderSchedule from "./components/RenderSchedule";
-
-import * as Notifications from "expo-notifications";
-import {themeHook} from "./components/theme";
+import Popup from "./components/TaskPopup/Popup";
+import RenderSchedule from "./components/Schedule/RenderSchedule";
+import {taskHook, themeHook} from "./components/theme";
 import Profile from "./components/Profile";
-import UselessTextInput from "./components/UselessTextInput";
+import {readXMLRequest} from "./calendarParser";
+import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import {navigate, navigationRef} from './RootNavigation';
 
 
+const Stack = createNativeStackNavigator();
 export default function App() {
-    const [selectedStartDate] = useState(null);
     const [page, setPage] = useState("today");
     const [isShowingAddTask, setIsShowAddTask] = useState(false);
     const [isShowingEditTask, setIsShowEditTask] = useState(false);
     const [taskBeginEdited, setTaskBeingEdited] = useState(null);
+    const [isCalendarLoaded, setCalendarLoaded] = useState(false);
     const [theme] = themeHook();
-    const [tasks, setTasks] = useState(defaultTasks);
+    const [tasks, setTasks] = taskHook();
 
-    const showPage = () => {
-        switch (page) {
-            case "today":
-                return <ScrollView snapToStart>
-                    <ModalTask activate={isShowingAddTask} onSubmit={(task) => {
-                        const other = [...tasks];
-                        other.push(task);
-                        setTasks(other);
-                        setIsShowAddTask(false);
-                    }} onDismiss={() => setIsShowAddTask(false)}/>
-
-                    <ModalTask activate={isShowingEditTask} editTask={taskBeginEdited} onSubmit={() => {
-                        setIsShowEditTask(false);
-                        const other = [...tasks];
-                        setTasks(other);
-                    }} onDeleteTask={(task) => {
-                        setTasks(tasks.filter(a => JSON.stringify(a) !== JSON.stringify(task)));
-                        setIsShowEditTask(false);
-                    }} onDismiss={() => setIsShowEditTask(false)}
-                    />
-                    <RenderSchedule givenTasks={tasks}
-                                    callbackTaskPressed={(task) => {
-                                        setTaskBeingEdited(task);
-                                        setIsShowEditTask(true);
-                                    }}/>
-                </ScrollView>;
-            case "Ceva":
-                return <Ceva/>
-            case "calendar":
-                return <UselessTextInput/>
-            case "profile":
-                return <Profile/>
-        }
+    const loadCalendar = () => {
+        if (isCalendarLoaded)
+            return;
+        console.log("Loading calendar");
+        readXMLRequest((data) => {
+            setTasks(data);
+            setCalendarLoaded(true);
+            console.log("Loaded done!")
+        });
     }
+    useEffect(() => loadCalendar(), []);
+    const navTheme = {
+        ...DefaultTheme,
+        colors: {
+            ...DefaultTheme.colors,
+            background: theme === 'white' ? 'white' : 'black',
+        },
+    };
+
 
     const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-            paddingTop: 20,
-            backgroundColor: theme === 'white' ? 'white' : 'black',
-        },
+
         realContainer: {
             flex: 1,
             backgroundColor: theme === 'white' ? 'white' : 'black',
@@ -76,7 +57,6 @@ export default function App() {
             backgroundColor: theme === 'white' ? '#FFFFFF' : '#313131',
         },
         navitem: {
-            color: 'black',
             fontSize: 15,
             height: "100%",
             flex: 1,
@@ -85,16 +65,34 @@ export default function App() {
         }
     });
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.realContainer}>
-                {showPage()}
-            </View>
+
+        <NavigationContainer ref={navigationRef} theme={navTheme}>
+            <Stack.Navigator initialRouteName="Settings" screenOptions={{
+                headerTintColor: theme == 'white' ? 'black' : 'white',
+                headerStyle: {
+                    backgroundColor: theme === 'white' ? 'white' : '#353535',
+                },
+                headerTitleAlign: 'center',
+                headerTitleStyle: {
+                    fontWeight: 'bold',
+                },
+            }}>
+                <Stack.Group screenOptions={{headerBackVisible: false}}>
+                    <Stack.Screen name="Dumnezeu" component={Ceva}/>
+                    <Stack.Screen name="Profile" component={Profile}/>
+                    <Stack.Screen name="Today" component={RenderSchedule}/>
+                </Stack.Group>
+                <Stack.Group screenOptions={{presentation: 'modal'}}>
+                    <Stack.Screen name="AddTask" component={Popup} options={{headerShown: false}}/>
+                </Stack.Group>
+            </Stack.Navigator>
             <View style={styles.nav}>
-                <TouchableOpacity onPress={() => setPage("today")}
-                                  style={styles.navitem}><MyText>Today</MyText></TouchableOpacity>
-                <TouchableOpacity onPress={() => setPage("Ceva")}
+                <TouchableOpacity
+                    onPress={() => navigate("Today")}
+                    style={styles.navitem}><MyText>Today</MyText></TouchableOpacity>
+                <TouchableOpacity onPress={() => navigate("Dumnezeu")}
                                   style={styles.navitem}><MyText>Ceva</MyText></TouchableOpacity>
-                <TouchableOpacity onPress={() => setIsShowAddTask(true)} style={styles.navitem}>
+                <TouchableOpacity onPress={() => navigate('AddTask')} style={styles.navitem}>
                     <View style={{
                         width: 40,
                         height: 40,
@@ -118,12 +116,12 @@ export default function App() {
                         }}/>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setPage("calendar")}
+                <TouchableOpacity onPress={() => navigate("Calendar")}
                                   style={styles.navitem}><MyText>Calendar</MyText></TouchableOpacity>
-                <TouchableOpacity onPress={() => setPage("profile")}
+                <TouchableOpacity onPress={() => navigate("Profile")}
                                   style={styles.navitem}><MyText>Profile</MyText></TouchableOpacity>
             </View>
-        </SafeAreaView>
+        </NavigationContainer>
     );
 }
 

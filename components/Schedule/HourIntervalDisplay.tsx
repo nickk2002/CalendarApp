@@ -1,10 +1,10 @@
 import {Text, View} from "react-native";
-import {colors} from "../colors";
-import {formatHourTime, time} from "../Utils";
+import {colors} from "../../colors";
+import {formatHourTime, Time} from "../../Utils";
 import React from "react";
 
 export type TimeInterval = {
-    startTime: time, endTime: time,
+    startTime: Time, endTime: Time,
 }
 
 export default function HourIntervalDisplay(props: TimeInterval) {

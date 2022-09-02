@@ -1,24 +1,32 @@
 import React from "react";
 import {Modal, TouchableWithoutFeedback, View} from "react-native";
-import {CalendarItemType} from "../CalendarItem";
+import {CalendarItemType} from "../Schedule/CalendarItem";
 
 import {themeHook} from "../theme";
 import ActualContent from "./ActualModalContent";
+import {navigateBack} from "../../RootNavigation";
+import {Time} from "../../Utils";
 
 
 export type PopupSettings = {
-    onSubmit: (arg0: CalendarItemType) => void,
-    activate?: boolean,
     editTask?: CalendarItemType,
-    onDeleteTask?: (arg0: CalendarItemType) => any
-    onDismiss: () => void;
+    startTime: Time,
+    endTime: Time,
 }
-const Popup = (props: PopupSettings) => {
+const Popup = ({route}) => {
     const [theme] = themeHook();
-
+    let editTask = null;
+    if (route.params?.editTask)
+        editTask = route.params.editTask;
+    let startDate = null, endDate = null;
+    if (route.params?.startTime) {
+        startDate = route.params.startTime;
+        endDate = route.params.endTime;
+        console.log("Received", route.params);
+    }
 
     function pressedOutside() {
-        props.onDismiss();
+        navigateBack();
     }
 
     // END
@@ -27,7 +35,6 @@ const Popup = (props: PopupSettings) => {
             animated
             animationType="fade"
             transparent
-            visible={props.activate}
         >
             <View style={{flex: 1}}>
                 <View style={{flex: 1}}>
@@ -37,8 +44,7 @@ const Popup = (props: PopupSettings) => {
                             backgroundColor: theme == 'white' ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0.6)"
                         }}/>
                     </TouchableWithoutFeedback>
-                    <ActualContent onDismiss={props.onDismiss} editTask={props.editTask} onSubmit={props.onSubmit}
-                                   onDeleteTask={props.onDeleteTask}/>
+                    <ActualContent editTask={editTask} startTime={startDate} endTime={endDate}/>
                 </View>
             </View>
         </Modal>
