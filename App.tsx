@@ -78,7 +78,7 @@ export default function App() {
                     <Stack.Screen name="Profile" component={Profile}/>
                     <Stack.Screen name="Today" component={RenderSchedule}/>
                 </Stack.Group>
-                <Stack.Group screenOptions={{presentation: 'modal'}}>
+                <Stack.Group screenOptions={{presentation: 'transparentModal'}}>
                     <Stack.Screen name="AddTask" component={Popup} options={{headerShown: false}}/>
                 </Stack.Group>
             </Stack.Navigator>
