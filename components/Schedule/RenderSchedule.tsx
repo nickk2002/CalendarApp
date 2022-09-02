@@ -1,4 +1,4 @@
-import {Dimensions, ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
+import {ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
 import {
     compareTime,
     createJsDateFromTimeFormat,
@@ -6,8 +6,7 @@ import {
     getDayMonth,
     getHourDifference,
     getTimeWithThisHour,
-    getToday,
-    parseIntoTimeObject,
+    parseIntoTimeObject, prettyPrintDayName,
     Time
 } from "../../Utils";
 
@@ -25,7 +24,7 @@ const timeHeight = 100;
 const spaceBetween = 2;
 const initialTimeHour = 7;
 
-export default function RenderSchedule() {
+export default function RenderSchedule({navigation}) {
     const [tasks, setTasks] = useState([]);
 
     const [theme] = themeHook();
@@ -48,6 +47,13 @@ export default function RenderSchedule() {
         setTasks(filtered);
     }
     useEffect(sortAndFilterTasks, [givenTasks, currentDate]);
+
+    useEffect(() => {
+        const dayName =  prettyPrintDayName(currentDate);
+        navigation.setOptions({
+            title: dayName
+        })
+    }, [currentDate, navigation])
     const renderTasks = (timeHeight: number, spaceBetween: number) => {
         const toRender = [];
         let previousHour: Time = getTimeWithThisHour(currentDate, initialTimeHour);
@@ -158,7 +164,7 @@ export default function RenderSchedule() {
     return (
         <View>
             <View style={{margin: 5, marginTop: 10}}>
-                <View style={{flexDirection: 'row', alignSelf: 'center',marginBottom:10}}>
+                <View style={{flexDirection: 'row', alignSelf: 'center', marginBottom: 10}}>
 
                     <TouchableOpacity onPress={() => {
                         const jsDate = createJsDateFromTimeFormat(currentDate);

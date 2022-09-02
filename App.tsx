@@ -13,13 +13,9 @@ import {navigate, navigationRef} from './RootNavigation';
 
 const Stack = createNativeStackNavigator();
 export default function App() {
-    const [page, setPage] = useState("today");
-    const [isShowingAddTask, setIsShowAddTask] = useState(false);
-    const [isShowingEditTask, setIsShowEditTask] = useState(false);
-    const [taskBeginEdited, setTaskBeingEdited] = useState(null);
     const [isCalendarLoaded, setCalendarLoaded] = useState(false);
     const [theme] = themeHook();
-    const [tasks, setTasks] = taskHook();
+    const [, setTasks] = taskHook();
 
     const loadCalendar = () => {
         if (isCalendarLoaded)

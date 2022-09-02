@@ -31,17 +31,6 @@ function Bold(props: { children: React.ReactNode }) {
 
     return (<MyText style={{fontWeight: 'bold'}}>{props.children}</MyText>)
 }
-
-function NumberedList(props) {
-    return (
-        props.elements.map(
-            (el, i) => {
-                <MyText>{i + 1}. {el}</MyText>
-            }
-        )
-    )
-}
-
 export default function Dumnezeu() {
     return (
         <ScrollView style={{ marginRight: 10, marginLeft: 10,marginTop:10}}>

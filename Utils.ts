@@ -35,6 +35,10 @@ export function createJsDateFromTimeFormat(time: Time): Date {
     return new Date(`${time.day} ${time.month} 2022 ${time.hour}:${time.minutes}`)
 }
 
+export function prettyPrintDayName(time: Time) {
+    return dateFormat(createJsDateFromTimeFormat(time), "DDDD")
+}
+
 export function getToday(): Time {
     const now = Date();
     return parseIntoTimeObject(now);
@@ -53,7 +57,6 @@ export function prettyPrintDifferenceTime(time1: Time, time2: Time) {
     if (difMinutes <= 0)
         return "No duration"
     // assume only hours/ minutes
-
 
     const hours = Math.floor(difMinutes / 60);
     const minutes = difMinutes - hours * 60;
