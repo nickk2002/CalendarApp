@@ -27,6 +27,7 @@
     "react-dom": "18.0.0",
     "react-native": "0.69.5",
     "react-native-date-picker": "^4.2.5",
+    "react-native-flash-message": "^0.3.1",
     "react-native-global-state-hooks": "^2.0.1",
     "react-native-modal-datetime-picker": "^13.1.2",
     "react-native-push-notification": "^8.1.1",

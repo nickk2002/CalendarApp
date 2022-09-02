@@ -125,6 +125,9 @@ export function compareTime(time1: Time, time2: Time) {
 
 }
 
+/*
+Difference between time2 and time1
+ */
 export function getHourDifference(time1: Time, time2: Time) {
     const minutes2 = 60 * time2.hour + time2.minutes;
     const minutes1 = 60 * time1.hour + time1.minutes;

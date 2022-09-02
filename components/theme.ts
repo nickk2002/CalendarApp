@@ -12,5 +12,8 @@ export const themeHook = themeStore.getHook()
 const taskStore = new GlobalStore([]);
 export const taskHook = taskStore.getHook()
 
+const filteredTaskStore = new GlobalStore([]);
+export const filteredTasksHook = filteredTaskStore.getHook()
+
 const currentDay = new GlobalStore(parseIntoTimeObject(Date()));
 export const calendarDayHook = currentDay.getHook()

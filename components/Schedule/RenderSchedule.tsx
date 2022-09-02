@@ -6,17 +6,18 @@ import {
     getDayMonth,
     getHourDifference,
     getTimeWithThisHour,
-    parseIntoTimeObject, prettyPrintDayName,
+    parseIntoTimeObject,
+    prettyPrintDayName,
     Time
 } from "../../Utils";
 
 import CalendarItem from "./CalendarItem";
 import {MyText} from "../Ceva";
-import {calendarDayHook, taskHook, themeHook} from "../theme";
+import {calendarDayHook, filteredTasksHook, taskHook, themeHook} from "../theme";
 import {navigate} from "../../RootNavigation";
 
 import {AntDesign, Ionicons} from '@expo/vector-icons';
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import clone from "just-clone";
 import {colors} from "../../colors";
 
@@ -25,11 +26,12 @@ const spaceBetween = 2;
 const initialTimeHour = 7;
 
 export default function RenderSchedule({navigation}) {
-    const [tasks, setTasks] = useState([]);
+    // const [tasks, setTasks] = useState([]);
 
     const [theme] = themeHook();
     const [givenTasks] = taskHook();
     const [currentDate, setCurrentDate] = calendarDayHook();
+    const [tasks, setFilteredTasks] = filteredTasksHook();
 
     const sortAndFilterTasks = () => {
         const filtered = givenTasks.filter((task) =>
@@ -44,12 +46,12 @@ export default function RenderSchedule({navigation}) {
             return 1;
         });
         console.log("Given tasks", givenTasks.length);
-        setTasks(filtered);
+        setFilteredTasks(filtered);
     }
     useEffect(sortAndFilterTasks, [givenTasks, currentDate]);
 
     useEffect(() => {
-        const dayName =  prettyPrintDayName(currentDate);
+        const dayName = prettyPrintDayName(currentDate);
         navigation.setOptions({
             title: dayName
         })
@@ -162,7 +164,7 @@ export default function RenderSchedule({navigation}) {
     }
 
     return (
-        <View>
+        <View style={{flex: 1}}>
             <View style={{margin: 5, marginTop: 10}}>
                 <View style={{flexDirection: 'row', alignSelf: 'center', marginBottom: 10}}>
 

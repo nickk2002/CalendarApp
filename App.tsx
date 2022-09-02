@@ -9,6 +9,7 @@ import {readXMLRequest} from "./calendarParser";
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import {navigate, navigationRef} from './RootNavigation';
+import FlashMessage from "react-native-flash-message";
 
 
 const Stack = createNativeStackNavigator();
@@ -117,6 +118,7 @@ export default function App() {
                 <TouchableOpacity onPress={() => navigate("Profile")}
                                   style={styles.navitem}><MyText>Profile</MyText></TouchableOpacity>
             </View>
+            <FlashMessage position="top" />
         </NavigationContainer>
     );
 }

@@ -7,16 +7,19 @@ import {
     createJsDateFromTimeFormat,
     dateFormatString,
     displayTimeToDateFormat,
+    formatHourTime,
+    getHourDifference,
     getTimeWithThisHour,
     getToday,
     parseIntoTimeObject,
     prettyPrintDifferenceDate,
-    prettyPrintTime
+    prettyPrintTime,
+    Time
 } from "../../Utils";
 
 import {MyText} from "../Ceva";
-import React, {useEffect, useState} from "react";
-import {calendarDayHook, taskHook, themeHook} from "../theme";
+import React, {useEffect, useRef, useState} from "react";
+import {calendarDayHook, filteredTasksHook, taskHook, themeHook} from "../theme";
 import {colors} from "../../colors";
 import {CalendarItemType} from "../Schedule/CalendarItem";
 import {PopupSettings} from "./Popup";
@@ -25,6 +28,8 @@ import EventOption from "./EventOptions";
 import ColorPicker, {randomColor} from "./ColorPicker";
 import {DeleteButton} from "./DeleteButton";
 import {navigateBack} from "../../RootNavigation";
+import FlashMessage from "react-native-flash-message";
+import clone from "just-clone";
 
 
 export default function ActualContent(props: PopupSettings) {
@@ -34,6 +39,10 @@ export default function ActualContent(props: PopupSettings) {
     const [theme] = themeHook();
     const [tasks, setTasks] = taskHook();
     const [getCalendarDay] = calendarDayHook();
+    const [filteredTasks] = filteredTasksHook()
+
+    const flashMessage = useRef(null);
+    const editingTaskCopy = clone(props.editTask);
 
     const [isDatePickerVisibleStart, setStartDateVisibility] = useState(false);
     const [isDatePickerVisibleEnd, setDatePickerVisibilityEnd] = useState(false);
@@ -66,8 +75,53 @@ export default function ActualContent(props: PopupSettings) {
         }
     })
 
+    function validateStartTimes(start: Time, end: Time) {
+        if (getHourDifference(start, end) < 0) {
+            console.log("Bad!")
+            flashMessage.current.showMessage({
+                message: "Start time should be smaller than end time",
+                description: `Task starts at ${formatHourTime(start)} and ends at ${formatHourTime(end)}`,
+                type: "danger"
+            })
+            return false;
+        }
+        console.log("I have filtered:", filteredTasks.length)
+        for (const otherTask of filteredTasks) {
+            if (getHourDifference(otherTask.startTime, start) > 0 && getHourDifference(start, otherTask.endTime) > 0) {
+                flashMessage.current.showMessage({
+                    message: "Start time overlaps with another task " + otherTask.header,
+                    description: `${formatHourTime(start)} overlaps with [${formatHourTime(otherTask.startTime)}, ${formatHourTime(otherTask.endTime)}]`,
+                    type: "danger"
+                })
+                return false;
+            }
+            if (getHourDifference(otherTask.startTime, end) > 0 && getHourDifference(end, otherTask.endTime) > 0) {
+                flashMessage.current.showMessage({
+                    message: "End time overlaps with another task " + otherTask.header,
+                    description: `${formatHourTime(end)} overlaps with [${formatHourTime(otherTask.startTime)}, ${formatHourTime(otherTask.endTime)}]`,
+                    type: "danger"
+                })
+                return false;
+            }
+            if (getHourDifference(otherTask.startTime, start) < 0 && getHourDifference(end, otherTask.endTime) < 0) {
+                flashMessage.current.showMessage({
+                    message: "Start time and end time includes " + otherTask.header,
+                    description: `[${formatHourTime((start))} ${formatHourTime(end)}] includes [${formatHourTime(otherTask.startTime)}, ${formatHourTime(otherTask.endTime)}]`,
+                    type: "danger"
+                })
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     function createTask() {
+        const start = parseIntoTimeObject(startTime);
+        const end = parseIntoTimeObject(endTime);
+        if (!validateStartTimes(start, end)) {
+            return;
+        }
         const newTask: CalendarItemType = {
             header: taskHeader,
             description: taskDescription,
@@ -81,14 +135,24 @@ export default function ActualContent(props: PopupSettings) {
         const copy = [...tasks];
         copy.push(newTask);
         setTasks(copy);
+        navigateBack();
     }
 
 
     function editTask() {
+        const start = props.editTask.startTime;
+        const end = props.editTask.endTime;
+        if (!validateStartTimes(start, end)) {
+            props.editTask.startTime = editingTaskCopy.startTime;
+            props.editTask.endTime = editingTaskCopy.endTime;
+            console.log("Not valid byt rolling back", props.editTask);
+            return;
+        }
         props.editTask.timeChanged = getToday();
         console.log(props.editTask)
         const other = [...tasks];
         setTasks(other);
+        navigateBack();
     }
 
     function renderHeader() {
@@ -266,7 +330,6 @@ export default function ActualContent(props: PopupSettings) {
                             createTask();
                         else
                             editTask();
-                        navigateBack();
                     }}>
                     <MyText>{props.editTask ? "Update Task" : "Add Task"}</MyText>
                 </TouchableOpacity>
@@ -274,6 +337,7 @@ export default function ActualContent(props: PopupSettings) {
                     renderLastEditDate()
                 }
             </View>
+            <FlashMessage ref={flashMessage} floating={true} position="bottom"/>
         </View>
     )
 }
