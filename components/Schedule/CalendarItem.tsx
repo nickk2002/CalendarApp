@@ -58,8 +58,8 @@ export default function CalendarItem(props: CalendarItemType) {
         },
         header: {
             fontSize: 18,
+            flex:1,
             fontWeight: 'bold',
-            marginRight:"15%"
         },
         description: {
             marginTop: 5,
@@ -72,10 +72,12 @@ export default function CalendarItem(props: CalendarItemType) {
             <TouchableOpacity activeOpacity={0.7} onPress={() => props.handlePress()} style={styles.containerFreeTime}>
                 <RenderLine color="green"/>
                 <View style={{padding: 15, flex: 1}}>
-                    <MyText style={styles.header}>Free</MyText>
 
-                    <HourIntervalDisplay startTime={props.startTime}
-                                         endTime={props.endTime}/>
+                    <View style={{flexDirection: 'row', justifyContent: 'flex-start', overflow: "hidden"}}>
+                        <MyText style={[styles.header, {flex: 1}]}>Free</MyText>
+                        <HourIntervalDisplay startTime={props.startTime} endTime={props.endTime}/>
+                    </View>
+
                     {/*<MyText style={{*/}
                     {/*    position: 'absolute',*/}
                     {/*    bottom: 0,*/}
@@ -96,12 +98,14 @@ export default function CalendarItem(props: CalendarItemType) {
         <TouchableOpacity activeOpacity={0.7} onPress={() => props.handlePress()} style={styles.container}>
             <RenderLine color={props.color}/>
             <View style={{margin: 15, flex: 1, overflow: 'hidden'}}>
-                <MyText style={styles.header}>{props.header}</MyText>
+                <View style={{flexDirection: 'row', justifyContent: 'flex-start', overflow: "hidden"}}>
+                    <MyText style={styles.header}>{props.header}</MyText>
+                    <HourIntervalDisplay startTime={props.startTime} endTime={props.endTime}/>
+                </View>
                 <MyText show={props.course} style={[styles.description, styles.course]}>{props.course}</MyText>
                 <MyText show={props.location} style={styles.description}>{props.location}</MyText>
                 <MyText style={styles.description}>{props.description?.trim()}</MyText>
             </View>
-            <HourIntervalDisplay startTime={props.startTime} endTime={props.endTime}/>
         </TouchableOpacity>
     );
 }

@@ -6,7 +6,7 @@ import React from "react";
 export function DeleteButton(props: { isVisible: boolean, onDelete, message: string }) {
     return (
         props.isVisible ?
-            <View style={{flex: 0.1, flexDirection: "row-reverse"}}>
+            <View style={{height:30,justifyContent:'center'}}>
                 <TouchableOpacity onPress={() => {
                     Alert.alert(
                         props.message,

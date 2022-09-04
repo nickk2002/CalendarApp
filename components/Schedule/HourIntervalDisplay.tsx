@@ -8,14 +8,19 @@ export type TimeInterval = {
 }
 
 export default function HourIntervalDisplay(props: TimeInterval) {
-    return (<View
-        style={{
-            position: 'absolute', top: 0, right: 0, padding: 15, flexDirection: "row", alignItems: "center",
-        }}>
-        <Text style={{color: colors.textgrey}}>{formatHourTime(props.startTime)}</Text>
-        <View style={{
-            width: 10, height: 1, backgroundColor: colors.textgrey, marginLeft: 3, marginRight: 3
-        }}/>
-        <Text style={{color: colors.textgrey}}>{formatHourTime(props.endTime)}</Text>
-    </View>);
+    return (
+        <View
+            style={{
+                paddingTop:3,
+                flexDirection: "row", alignItems: "flex-start",
+            }}>
+            <Text style={{color: colors.textgrey}}>{formatHourTime(props.startTime)}</Text>
+
+            <View style={{alignItems: 'center', justifyContent: 'center',height:20 }}>
+                <View style={{
+                    width: 10, height: 1, backgroundColor: colors.textgrey, marginLeft: 3, marginRight: 3
+                }}/>
+            </View>
+            <Text style={{color: colors.textgrey}}>{formatHourTime(props.endTime)}</Text>
+        </View>);
 }

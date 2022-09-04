@@ -4,13 +4,13 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import dateFormat from "dateformat";
 import {
-    parseIntoJsDateFromTime,
     dateFormatString,
     displayTimeToDateFormat,
     formatHourTime,
     getHourDifference,
     getTimeWithThisHour,
     getToday,
+    parseIntoJsDateFromTime,
     parseIntoTimeObject,
     prettyPrintDifferenceDate,
     prettyPrintTime,
@@ -157,20 +157,23 @@ export default function ActualContent(props: PopupSettings) {
 
     function renderHeader() {
         return (props.editTask ?
-                <TextInput
-                    editable={!props.editTask?.isFromCalendar}
-                    onChangeText={(content) => props.editTask.header = content}
-                    style={[styles.headerTextInput, {color: backgroundColor()}]}>
-                    {props.editTask.header}
-                </TextInput>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <TextInput
+                        editable={!props.editTask?.isFromCalendar}
+                        onChangeText={(content) => props.editTask.header = content}
+                        style={[styles.headerTextInput, {color: backgroundColor()}]}>
+                        {props.editTask.header}
+                    </TextInput>
+                </ScrollView>
                 :
-                <TextInput
-                    placeholderTextColor={backgroundColorPlaceHolder()}
-                    placeholder="New Task"
-                    onChangeText={setTaskHeader}
-                    value={taskHeader}
-                    style={[styles.headerTextInput, {color: backgroundColor()}]}/>
-
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <TextInput
+                        placeholderTextColor={backgroundColorPlaceHolder()}
+                        placeholder="New Task"
+                        onChangeText={setTaskHeader}
+                        value={taskHeader}
+                        style={[styles.headerTextInput, {color: backgroundColor()}]}/>
+                </ScrollView>
         )
     }
 
@@ -235,6 +238,7 @@ export default function ActualContent(props: PopupSettings) {
                             width: 20,
                             height: 20,
                             borderRadius: 100,
+                            marginRight: 10,
                             backgroundColor: props.editTask ? props.editTask?.color : taskColor
                         }}/>
                     {renderHeader()}
@@ -333,7 +337,7 @@ export default function ActualContent(props: PopupSettings) {
             <View style={{backgroundColor: theme == 'white' ? colors.lightgrey : "#4a4949", padding: 10}}/>
 
             <View style={{
-                paddingVertical:20,
+                paddingVertical: 20,
                 alignItems: 'center',
                 justifyContent: 'space-evenly',
                 flex: 1,
@@ -385,6 +389,5 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
         flex: 1,
-        marginLeft: 10,
     }
 });
