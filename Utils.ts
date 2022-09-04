@@ -31,12 +31,12 @@ export function displayTimeToDateFormat(time: Time) {
     return `${time.day} ${time.month}, ${padZero(time.hour)} :${padZero(time.minutes)}`
 }
 
-export function createJsDateFromTimeFormat(time: Time): Date {
+export function parseIntoJsDateFromTime(time: Time): Date {
     return new Date(`${time.day} ${time.month} 2022 ${time.hour}:${time.minutes}`)
 }
 
 export function prettyPrintDayName(time: Time) {
-    return dateFormat(createJsDateFromTimeFormat(time), "DDDD")
+    return dateFormat(parseIntoJsDateFromTime(time), "DDDD")
 }
 
 export function getToday(): Time {
@@ -45,7 +45,7 @@ export function getToday(): Time {
 }
 
 export function prettyPrintTime(time: Time) {
-    return dateFormat(createJsDateFromTimeFormat(time), "d mmm 'At' HH:MM")
+    return dateFormat(parseIntoJsDateFromTime(time), "d mmm 'At' HH:MM")
 }
 
 export function prettyPrintDifferenceDate(time1: string, time2: string) {

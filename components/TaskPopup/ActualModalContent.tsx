@@ -4,7 +4,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import dateFormat from "dateformat";
 import {
-    createJsDateFromTimeFormat,
+    parseIntoJsDateFromTime,
     dateFormatString,
     displayTimeToDateFormat,
     formatHourTime,
@@ -46,8 +46,8 @@ export default function ActualContent(props: PopupSettings) {
 
     const [isDatePickerVisibleStart, setStartDateVisibility] = useState(false);
     const [isDatePickerVisibleEnd, setDatePickerVisibilityEnd] = useState(false);
-    const [startTime, setStartTime]: [string, any] = useState(createJsDateFromTimeFormat(getTimeWithThisHour(getCalendarDay, 10)).toString());
-    const [endTime, setEndTime]: [string, any] = useState(createJsDateFromTimeFormat(getTimeWithThisHour(getCalendarDay, 11)).toString());
+    const [startTime, setStartTime]: [string, any] = useState(parseIntoJsDateFromTime(getTimeWithThisHour(getCalendarDay, 10)).toString());
+    const [endTime, setEndTime]: [string, any] = useState(parseIntoJsDateFromTime(getTimeWithThisHour(getCalendarDay, 11)).toString());
 
     const [taskColor, setTaskColor] = useState(randomColor());
     const [isColorPicking, setColorPicking] = useState(false);
@@ -64,14 +64,14 @@ export default function ActualContent(props: PopupSettings) {
     }
     useEffect(() => {
         if (props.startTime) {
-            setStartTime(createJsDateFromTimeFormat(props.startTime));
-            setEndTime(createJsDateFromTimeFormat(props.endTime));
+            setStartTime(parseIntoJsDateFromTime(props.startTime));
+            setEndTime(parseIntoJsDateFromTime(props.endTime));
         }
     }, [])
     useEffect(() => {
         if (props.editTask) {
-            setStartTime(createJsDateFromTimeFormat(props.editTask.startTime).toString());
-            setEndTime(createJsDateFromTimeFormat(props.editTask.endTime).toString());
+            setStartTime(parseIntoJsDateFromTime(props.editTask.startTime).toString());
+            setEndTime(parseIntoJsDateFromTime(props.editTask.endTime).toString());
         }
     })
 
@@ -209,13 +209,13 @@ export default function ActualContent(props: PopupSettings) {
     }
 
     function handleConfirmStart(date) {
-        props.editTask ? props.editTask.startTime = parseIntoTimeObject(date) : setStartTime(date);
         setStartDateVisibility(false);
+        props.editTask ? props.editTask.startTime = parseIntoTimeObject(date) : setStartTime(date);
     }
 
     function handleConfirmEnd(date: Date) {
-        props.editTask ? props.editTask.endTime = parseIntoTimeObject(date) : setEndTime(date);
         setDatePickerVisibilityEnd(false);
+        props.editTask ? props.editTask.endTime = parseIntoTimeObject(date) : setEndTime(date);
     }
 
     const displayInitialStartDate = () => {

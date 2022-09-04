@@ -1,7 +1,7 @@
 import {ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
 import {
     compareTime,
-    createJsDateFromTimeFormat,
+    parseIntoJsDateFromTime,
     formatHourTime,
     getDayMonth,
     getHourDifference,
@@ -17,22 +17,23 @@ import {calendarDayHook, filteredTasksHook, taskHook, themeHook} from "../theme"
 import {navigate} from "../../RootNavigation";
 
 import {AntDesign, Ionicons} from '@expo/vector-icons';
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import clone from "just-clone";
 import {colors} from "../../colors";
+import DateTimePicker from "react-native-modal-datetime-picker";
 
 const timeHeight = 100;
 const spaceBetween = 2;
 const initialTimeHour = 7;
 
 export default function RenderSchedule({navigation}) {
-    // const [tasks, setTasks] = useState([]);
 
     const [theme] = themeHook();
     const [givenTasks] = taskHook();
     const [currentDate, setCurrentDate] = calendarDayHook();
     const [tasks, setFilteredTasks] = filteredTasksHook();
 
+    const [visiblePickDate, setVisiblePickDate] = useState(false);
     const sortAndFilterTasks = () => {
         const filtered = givenTasks.filter((task) =>
             task.startTime.month === currentDate.month && currentDate.day === task.startTime.day
@@ -168,21 +169,33 @@ export default function RenderSchedule({navigation}) {
                 <View style={{flexDirection: 'row', alignSelf: 'center', marginBottom: 10}}>
 
                     <TouchableOpacity onPress={() => {
-                        const jsDate = createJsDateFromTimeFormat(currentDate);
+                        const jsDate = parseIntoJsDateFromTime(currentDate);
                         const tomorrow = jsDate.getDate() - 1;
                         jsDate.setDate(tomorrow);
                         setCurrentDate(parseIntoTimeObject(jsDate));
                     }} style={{justifyContent: 'center', paddingHorizontal: 10}}>
                         <AntDesign name="arrowleft" size={24} color={theme == 'white' ? 'black' : colors.textgrey}/>
                     </TouchableOpacity>
-                    <MyText
-                        style={{
-                            fontSize: 25,
-                            fontWeight: "bold",
-                            textAlign: "center"
-                        }}> {getDayMonth(createJsDateFromTimeFormat(currentDate))}</MyText>
+                    <TouchableOpacity onPress={()=>setVisiblePickDate(true)}>
+                        <MyText
+                            style={{
+                                fontSize: 25,
+                                fontWeight: "bold",
+                                textAlign: "center"
+                            }}> {getDayMonth(parseIntoJsDateFromTime(currentDate))}
+                        </MyText>
+                    </TouchableOpacity>
+                    <DateTimePicker isVisible={visiblePickDate}
+                                    date={new Date(parseIntoJsDateFromTime(currentDate))}
+                                    onConfirm={(date) => {
+                                        setCurrentDate(parseIntoTimeObject(date));
+                                        setVisiblePickDate(false);
+                                    }}
+
+                                    onCancel={() => setVisiblePickDate(false)}/>
+
                     <TouchableOpacity onPress={() => {
-                        const jsDate = createJsDateFromTimeFormat(currentDate);
+                        const jsDate = parseIntoJsDateFromTime(currentDate);
                         const tomorrow = jsDate.getDate() + 1;
                         jsDate.setDate(tomorrow);
                         setCurrentDate(parseIntoTimeObject(jsDate));
