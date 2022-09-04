@@ -51,9 +51,10 @@ function parseLines(lines: string[]): CalendarItemType[] {
         if (location.length > 0) {
             if (line.includes(":")) {
                 location = location.replace(new RegExp("\\\\", "g"), " ")
-                location = removeFromLocation(location, ["EEMCS", "(^-| -)", "Lecture Hall", "Auditorium", "- A"])
+                location = removeFromLocation(location, ["EEMCS", "(^-| -)" ,"Lecture Hall"]);
                 location = location.replace(new RegExp("-?\\([./\\w]+\\),?", "g"), "");
-                location = location.replace(new RegExp("Aula-", "g"), "Aula")
+                location = location.replace(new RegExp("Aula- A", "g"), "Aula A")
+                location = location.replace(new RegExp("- ", "g"), "-")
                 location = location.replace(new RegExp(" ,", "g"), ",")
                 location = location.replace(new RegExp("Drebbelweg", "g"), "DW")
 

@@ -1,4 +1,4 @@
-import {StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
@@ -225,7 +225,7 @@ export default function ActualContent(props: PopupSettings) {
         return props.editTask ? displayTimeToDateFormat(props.editTask.endTime) : dateFormat(endTime, dateFormatString);
     }
     return (
-        <View style={[styles.actualView, {backgroundColor: theme === 'white' ? "#FFFFFF" : "#2f2f2f"}]}>
+        <ScrollView style={[styles.actualView, {backgroundColor: theme === 'white' ? "#FFFFFF" : "#2f2f2f"}]}>
             <View style={styles.padding}>
                 {/*Header*/}
                 <View style={styles.header}>
@@ -305,13 +305,35 @@ export default function ActualContent(props: PopupSettings) {
             </Text>
             {renderDescription()}
 
+            {/*Render Location*/}
+            {props.editTask?.location ?
+                <View>
+                    <Text style={{
+                        backgroundColor: theme == 'white' ? colors.lightgrey : "#4a4949",
+                        color: theme == 'white' ? colors.textgrey : 'white',
+                        padding: 10,
+                        paddingLeft: 25,
+                        fontSize: 11
+                    }}>LOCATION
+                    </Text>
+                    <TextInput
+                        style={{paddingLeft: 25, padding: 10, fontSize: 15, color: backgroundColor()}}
+                        multiline
+                        scrollEnabled
+                        editable={false}
+                        value={props.editTask.location}
+                    />
+                </View>
+                :
+                <></>
+            }
             <View style={{backgroundColor: theme == 'white' ? colors.lightgrey : "#4a4949", padding: 10}}/>
-
             <EventOption name="Repeat" disableLine iconName="repeat"/>
             <EventOption name="Add Tag" disableLine iconName="add"/>
             <View style={{backgroundColor: theme == 'white' ? colors.lightgrey : "#4a4949", padding: 10}}/>
 
             <View style={{
+                paddingTop:20,
                 alignItems: 'center',
                 justifyContent: 'space-evenly',
                 flex: 1,
@@ -338,7 +360,7 @@ export default function ActualContent(props: PopupSettings) {
                 }
             </View>
             <FlashMessage ref={flashMessage} floating={true} position="bottom"/>
-        </View>
+        </ScrollView>
     )
 }
 // styles
