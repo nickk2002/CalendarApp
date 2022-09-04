@@ -168,6 +168,7 @@ export default function ActualContent(props: PopupSettings) {
                 :
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <TextInput
+                        autoFocus
                         placeholderTextColor={backgroundColorPlaceHolder()}
                         placeholder="New Task"
                         onChangeText={setTaskHeader}

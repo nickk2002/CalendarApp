@@ -1,0 +1,20 @@
+- [X] fix bug with Aula-A and Aula-Auditorium 
+- [ ] Add link to the building name
+- [ ] Exam fix names
+- [X] Show location in task view
+- [X] Scroll Modal Edit Task 
+- [X] Persistent location in storage Hope 
+- [ ] UI Different colors and same color for a course
+- [ ] more tasks same hour => no fix for this yet
+- [X] wrap header text => Added margin
+- [X] Date picker for Current Day
+- [X] status bar color for dark mode 
+- [ ] Bug dark mode/light mode preference save in local storage
+- [ ] UI fix flickering of tasks when updating them(maybe remove local storage from filtered tasks)
+- [X] Bug when creating a task at the end of the day it is not full width
+- [ ] UI Dark mode screen transitions have white flickering
+- [ ] Bug Keyboard does not open automatically when adding task
+- [ ] Repeat functionality for events
+- [ ] Feature, sa adaug alte rugaciuni scriind direct pe tel
+- [ ] Iconita are 16px si e foarte mica
+- 

@@ -1,11 +1,11 @@
 import {ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
 import {
     compareTime,
-    parseIntoJsDateFromTime,
     formatHourTime,
     getDayMonth,
     getHourDifference,
     getTimeWithThisHour,
+    parseIntoJsDateFromTime,
     parseIntoTimeObject,
     prettyPrintDayName,
     Time
@@ -129,8 +129,10 @@ export default function RenderSchedule({navigation}) {
             if (index + 1 == hours.length)
                 return;
             const nextHour = hours[index + 1];
+            console.log(hour.hour * 60 + hour.minutes);
             timestamps.push(
-                <View style={{flexDirection: "column", height: timeHeight * getHourDifference(hour, nextHour)}}>
+                <View key={hour.hour * 60 + hour.minutes}
+                      style={{flexDirection: "column", height: timeHeight * getHourDifference(hour, nextHour)}}>
                     <View
                         style={{
                             flexDirection: "row",
@@ -142,6 +144,20 @@ export default function RenderSchedule({navigation}) {
                 </View>
             );
         });
+        const hour = hours[hours.length - 1]
+        timestamps.push(
+            <View key={hour.hour * 60 + hour.minutes}
+                  style={{flexDirection: "column"}}>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center"
+                    }}>
+                    <MyText style={styles.time}>{formatHourTime(hour)} </MyText>
+                    <View style={{width: 10, height: 1, backgroundColor: colors.textgrey}}/>
+                </View>
+            </View>
+        );
         return (
             <View style={{marginRight: 5, marginTop: -10}}>
                 {timestamps}
@@ -164,69 +180,64 @@ export default function RenderSchedule({navigation}) {
     }
 
     return (
-        <View style={{flex: 1}}>
-            <View style={{margin: 5, marginTop: 10}}>
-                <View style={{flexDirection: 'row', alignSelf: 'center', marginBottom: 10}}>
+        <View style={{margin: 5, marginTop: 10, flex: 1}}>
+            <View style={{flexDirection: 'row', alignSelf: 'center', marginBottom: 10}}>
+                <TouchableOpacity onPress={() => {
+                    const jsDate = parseIntoJsDateFromTime(currentDate);
+                    const tomorrow = jsDate.getDate() - 1;
+                    jsDate.setDate(tomorrow);
+                    setCurrentDate(parseIntoTimeObject(jsDate));
+                }} style={{justifyContent: 'center', paddingHorizontal: 10}}>
+                    <AntDesign name="arrowleft" size={24} color={theme == 'white' ? 'black' : colors.textgrey}/>
+                </TouchableOpacity>
+                <TouchableOpacity activeOpacity={0.6} onPress={() => setVisiblePickDate(true)}>
+                    <MyText
+                        style={{
+                            fontSize: 25,
+                            fontWeight: "bold",
+                            textAlign: "center"
+                        }}> {getDayMonth(parseIntoJsDateFromTime(currentDate))}
+                    </MyText>
+                </TouchableOpacity>
+                <DateTimePicker isVisible={visiblePickDate}
+                                date={new Date(parseIntoJsDateFromTime(currentDate))}
+                                onConfirm={(date) => {
+                                    setCurrentDate(parseIntoTimeObject(date));
+                                    setVisiblePickDate(false);
+                                }}
 
-                    <TouchableOpacity onPress={() => {
-                        const jsDate = parseIntoJsDateFromTime(currentDate);
-                        const tomorrow = jsDate.getDate() - 1;
-                        jsDate.setDate(tomorrow);
-                        setCurrentDate(parseIntoTimeObject(jsDate));
-                    }} style={{justifyContent: 'center', paddingHorizontal: 10}}>
-                        <AntDesign name="arrowleft" size={24} color={theme == 'white' ? 'black' : colors.textgrey}/>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>setVisiblePickDate(true)}>
-                        <MyText
-                            style={{
-                                fontSize: 25,
-                                fontWeight: "bold",
-                                textAlign: "center"
-                            }}> {getDayMonth(parseIntoJsDateFromTime(currentDate))}
-                        </MyText>
-                    </TouchableOpacity>
-                    <DateTimePicker isVisible={visiblePickDate}
-                                    date={new Date(parseIntoJsDateFromTime(currentDate))}
-                                    onConfirm={(date) => {
-                                        setCurrentDate(parseIntoTimeObject(date));
-                                        setVisiblePickDate(false);
-                                    }}
+                                onCancel={() => setVisiblePickDate(false)}/>
 
-                                    onCancel={() => setVisiblePickDate(false)}/>
-
-                    <TouchableOpacity onPress={() => {
-                        const jsDate = parseIntoJsDateFromTime(currentDate);
-                        const tomorrow = jsDate.getDate() + 1;
-                        jsDate.setDate(tomorrow);
-                        setCurrentDate(parseIntoTimeObject(jsDate));
-                    }} style={{justifyContent: 'center', paddingHorizontal: 10}}>
-                        <AntDesign name="arrowright" size={24} color={theme == 'white' ? 'black' : colors.textgrey}/>
-                    </TouchableOpacity>
-                </View>
-                <ScrollView>
-                    {
-                        tasks.length > 0 ?
-
-                            <View style={{flex: 1, flexDirection: 'row', marginTop: 20, marginLeft: 5}}>
-                                {renderTime()}
-                                <View style={{flex: 1}}>
-                                    {renderTasks(timeHeight, spaceBetween)}
-                                </View>
-                            </View>
-                            :
-                            <View style={{
-                                height: '100%',
-                                width: '100%',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <MyText style={{fontSize: 20}}>No Tasks Today!</MyText>
-                                <Ionicons style={{marginTop: 10}} name="ios-checkmark-sharp" size={32}
-                                          color={theme == 'white' ? 'black' : 'grey'}/>
-                            </View>
-                    }
-                </ScrollView>
+                <TouchableOpacity onPress={() => {
+                    const jsDate = parseIntoJsDateFromTime(currentDate);
+                    const tomorrow = jsDate.getDate() + 1;
+                    jsDate.setDate(tomorrow);
+                    setCurrentDate(parseIntoTimeObject(jsDate));
+                }} style={{justifyContent: 'center', paddingHorizontal: 10}}>
+                    <AntDesign name="arrowright" size={24} color={theme == 'white' ? 'black' : colors.textgrey}/>
+                </TouchableOpacity>
             </View>
+            <ScrollView>
+                {tasks.length > 0 ?
+                    <View style={{flex: 1, flexDirection: 'row', marginTop: 20, marginLeft: 5}}>
+                        {renderTime()}
+                        <View style={{flex: 1}}>
+                            {renderTasks(timeHeight, spaceBetween)}
+                        </View>
+                    </View>
+                    :
+                    <View style={{
+                        height: '100%',
+                        width: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}>
+                        <MyText style={{fontSize: 20}}>No Tasks Today!</MyText>
+                        <Ionicons style={{marginTop: 10}} name="ios-checkmark-sharp" size={32}
+                                  color={theme == 'white' ? 'black' : 'grey'}/>
+                    </View>
+                }
+            </ScrollView>
         </View>
     );
 }

@@ -4,7 +4,7 @@
     "slug": "calendarapp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/calendar64.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -22,13 +22,16 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/calendar64.png",
         "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.nickk2002.calendarapp"
+    },
+    "description": "Funny calendar app",
+    "extra": {
+      "eas": {
+        "projectId": "4ea3cc0c-e180-4cd1-8411-b53f5bd1701e"
       }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "description": "Funny calendar app"
+    }
   }
 }
