@@ -3,24 +3,64 @@ import React, {useEffect, useState} from 'react';
 import Ceva, {MyText} from "./components/Ceva"
 import Popup from "./components/TaskPopup/Popup";
 import RenderSchedule from "./components/Schedule/RenderSchedule";
-import {storeTasksAsync, taskHook, tasksStorageKey, themeHook} from "./components/theme";
+import {storeTasksAsync, taskHook, tasksStorageKey, themeHook, themeStorageKey} from "./components/theme";
 import Profile from "./components/Profile";
 import {readXMLRequest} from "./calendarParser";
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import {navigate, navigationRef} from './RootNavigation';
 import FlashMessage from "react-native-flash-message";
-import {StatusBar} from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SplashScreen from 'expo-splash-screen';
 
-
+SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
 export default function App() {
     const [isCalendarLoaded, setCalendarLoaded] = useState(false);
     const [readFromLocalStorage, setReadFromLocalStorage] = useState(false);
     const [theme] = themeHook();
     const [, setTasks] = taskHook();
+    const [, setTheme] = themeHook()
 
+    const [isLoadingComplete, setLoadingComplete] = useState(false);
+    useEffect(() => {
+            async function prepare() {
+                try {
+                    // experience. Please remove this if you copy and paste the code!
+                    const storedTheme = await AsyncStorage.getItem(themeStorageKey);
+                    if (storedTheme == 'white') {
+                        setTheme("white");
+                        AsyncStorage.setItem(themeStorageKey, "white")
+                    } else if (storedTheme == "dark") {
+                        setTheme("dark");
+                        AsyncStorage.setItem(themeStorageKey, "dark")
+                    }
+                } catch
+                    (e) {
+                    console.warn(e);
+                } finally {
+                    // Tell the application to render
+                    console.log("Finished here");
+                    setLoadingComplete(true);
+                }
+            }
+
+            prepare();
+        }, []
+    );
+
+    useEffect(() => {
+        async function hide() {
+            await SplashScreen.hideAsync();
+        }
+        if (isLoadingComplete) {
+            hide().then(() => restoreTodosFromAsync());
+        }
+    }, [isLoadingComplete]);
+
+    if (!isLoadingComplete) {
+        return null;
+    }
     const loadCalendar = (parsedTasks) => {
         if (isCalendarLoaded)
             return;
@@ -60,7 +100,6 @@ export default function App() {
                 console.warn(err);
             });
     };
-    useEffect(() => restoreTodosFromAsync(), [])
     const navTheme = {
         ...DefaultTheme,
         colors: {
@@ -102,8 +141,7 @@ export default function App() {
                 headerStyle: {
                     backgroundColor: theme === 'white' ? 'white' : 'black',
                 },
-                headerShadowVisible: true,
-                statusBarColor: theme === 'white' ? 'white' : 'black',
+                statusBarColor: theme === 'white' ? 'grey' : 'black',
                 headerTitleAlign: 'center',
                 headerTitleStyle: {
                     fontWeight: 'bold',
@@ -154,7 +192,6 @@ export default function App() {
                                   style={styles.navitem}><MyText>Profile</MyText></TouchableOpacity>
             </View>
             <FlashMessage position="top"/>
-            <StatusBar style={theme == 'white' ? "light" : "dark"}/>
         </NavigationContainer>
     );
 }
