@@ -19,7 +19,7 @@ import {
 
 import {MyText} from "../Ceva";
 import React, {useEffect, useRef, useState} from "react";
-import {calendarDayHook, filteredTasksHook, taskHook, themeHook} from "../theme";
+import {calendarDayHook, filteredTasksHook, storeTasksAsync, taskHook, themeHook} from "../theme";
 import {colors} from "../../colors";
 import {CalendarItemType} from "../Schedule/CalendarItem";
 import {PopupSettings} from "./Popup";
@@ -77,7 +77,6 @@ export default function ActualContent(props: PopupSettings) {
 
     function validateStartTimes(start: Time, end: Time) {
         if (getHourDifference(start, end) < 0) {
-            console.log("Bad!")
             flashMessage.current.showMessage({
                 message: "Start time should be smaller than end time",
                 description: `Task starts at ${formatHourTime(start)} and ends at ${formatHourTime(end)}`,
@@ -135,6 +134,7 @@ export default function ActualContent(props: PopupSettings) {
         const copy = [...tasks];
         copy.push(newTask);
         setTasks(copy);
+        storeTasksAsync(copy);
         navigateBack();
     }
 
@@ -145,13 +145,12 @@ export default function ActualContent(props: PopupSettings) {
         if (!validateStartTimes(start, end)) {
             props.editTask.startTime = editingTaskCopy.startTime;
             props.editTask.endTime = editingTaskCopy.endTime;
-            console.log("Not valid byt rolling back", props.editTask);
             return;
         }
         props.editTask.timeChanged = getToday();
-        console.log(props.editTask)
         const other = [...tasks];
         setTasks(other);
+        // storeTasksAsync(other);
         navigateBack();
     }
 
@@ -166,15 +165,13 @@ export default function ActualContent(props: PopupSettings) {
                     </TextInput>
                 </ScrollView>
                 :
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <TextInput
-                        autoFocus
-                        placeholderTextColor={backgroundColorPlaceHolder()}
-                        placeholder="New Task"
-                        onChangeText={setTaskHeader}
-                        value={taskHeader}
-                        style={[styles.headerTextInput, {color: backgroundColor()}]}/>
-                </ScrollView>
+                <TextInput
+                    autoFocus
+                    placeholderTextColor={backgroundColorPlaceHolder()}
+                    placeholder="New Task"
+                    onChangeText={setTaskHeader}
+                    value={taskHeader}
+                    style={[styles.headerTextInput, {color: backgroundColor()}]}/>
         )
     }
 
@@ -245,7 +242,9 @@ export default function ActualContent(props: PopupSettings) {
                     {renderHeader()}
                     <DeleteButton isVisible={props.editTask != undefined}
                                   onDelete={() => {
-                                      setTasks(tasks.filter(t => JSON.stringify(t) !== JSON.stringify(props.editTask)));
+                                      const newTasks = tasks.filter(t => JSON.stringify(t) !== JSON.stringify(props.editTask))
+                                      setTasks(newTasks);
+                                      storeTasksAsync(newTasks);
                                       navigateBack();
                                   }}
                                   message={"Confirm delete " + props.editTask?.header}/>

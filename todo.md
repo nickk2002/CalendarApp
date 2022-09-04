@@ -17,4 +17,3 @@
 - [ ] Repeat functionality for events
 - [ ] Feature, sa adaug alte rugaciuni scriind direct pe tel
 - [ ] Iconita are 16px si e foarte mica
-- 

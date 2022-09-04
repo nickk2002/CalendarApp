@@ -81,8 +81,6 @@ function parseLines(lines: string[]): CalendarItemType[] {
                 event.course = splitter[0].trim();
                 if (splitter.length == 3) {
                     event.course = splitter[2].trim()
-                    console.log(event.header)
-                    console.log("Course name is:", splitter[2])
                 } else {
                     const re = RegExp("[0-9]+");
                     if (!re.test(event.course)) {
