@@ -59,6 +59,7 @@ export default function CalendarItem(props: CalendarItemType) {
         header: {
             fontSize: 18,
             fontWeight: 'bold',
+            marginRight:"15%"
         },
         description: {
             marginTop: 5,

@@ -9,7 +9,7 @@ if (theme === 'light')
 const themeStore = new GlobalStore(defaultTheme);
 export const themeHook = themeStore.getHook()
 
-const taskStore = new GlobalStore([]);
+const taskStore = new GlobalStore([],null,"GLOBAL_TASKS");
 export const taskHook = taskStore.getHook()
 
 const filteredTaskStore = new GlobalStore([]);

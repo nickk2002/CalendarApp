@@ -129,8 +129,7 @@ export default function RenderSchedule({navigation}) {
                 return;
             const nextHour = hours[index + 1];
             timestamps.push(
-                <View style={{flexDirection: "column", height: timeHeight * getHourDifference(hour, nextHour)}}
-                      key={hour.minutes + hour.hour * 60}>
+                <View style={{flexDirection: "column", height: timeHeight * getHourDifference(hour, nextHour)}}>
                     <View
                         style={{
                             flexDirection: "row",

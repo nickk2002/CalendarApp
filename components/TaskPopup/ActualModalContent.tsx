@@ -333,7 +333,7 @@ export default function ActualContent(props: PopupSettings) {
             <View style={{backgroundColor: theme == 'white' ? colors.lightgrey : "#4a4949", padding: 10}}/>
 
             <View style={{
-                paddingTop:20,
+                paddingVertical:20,
                 alignItems: 'center',
                 justifyContent: 'space-evenly',
                 flex: 1,
