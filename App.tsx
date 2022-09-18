@@ -12,6 +12,9 @@ import {navigate, navigationRef} from './RootNavigation';
 import FlashMessage from "react-native-flash-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from 'expo-splash-screen';
+import {StatusBar} from "expo-status-bar";
+import {CalendarItemType} from "./components/Schedule/CalendarItem";
+import {JSONEquals} from "./Utils";
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
@@ -35,6 +38,7 @@ export default function App() {
                         setTheme("dark");
                         AsyncStorage.setItem(themeStorageKey, "dark")
                     }
+                    restoreTodosFromAsync();
                 } catch
                     (e) {
                     console.warn(e);
@@ -53,25 +57,38 @@ export default function App() {
         async function hide() {
             await SplashScreen.hideAsync();
         }
+
         if (isLoadingComplete) {
-            hide().then(() => restoreTodosFromAsync());
+            hide();
         }
     }, [isLoadingComplete]);
 
     if (!isLoadingComplete) {
         return null;
     }
-    const loadCalendar = (parsedTasks) => {
+
+    function loadCalendar(parsedTasks) {
         if (isCalendarLoaded)
             return;
         console.log("Loading calendar");
         readXMLRequest((tasksFromCalendar) => {
             setCalendarLoaded(true);
-            let currentTasks = [];
+            let currentTasks: CalendarItemType[] = [];
             if (parsedTasks !== null)
                 currentTasks = parsedTasks;
             for (const calendarItem of tasksFromCalendar) {
                 if (currentTasks.filter(item => JSON.stringify(item) === JSON.stringify(calendarItem)).length == 0) {
+                    console.log("Push Item", calendarItem);
+                    const before = currentTasks.filter(item => JSONEquals(item.startTime, calendarItem.startTime) && JSONEquals(item.endTime, calendarItem.endTime)
+                                    && item.isFromCalendar == calendarItem.isFromCalendar);
+                    console.log(before);
+                    if (before.length > 0) {
+                        // save description
+                        calendarItem.description = before[0].description
+                        const index = currentTasks.indexOf(before[0]);
+                        console.log("Saved the description", calendarItem.description)
+                        currentTasks.splice(index, 1)
+                    }
                     currentTasks.push(calendarItem);
                 }
             }
@@ -79,7 +96,8 @@ export default function App() {
             storeTasksAsync(currentTasks);
         });
     }
-    const restoreTodosFromAsync = () => {
+
+    function restoreTodosFromAsync() {
         if (readFromLocalStorage)
             return;
         AsyncStorage.getItem(tasksStorageKey)
@@ -192,6 +210,7 @@ export default function App() {
                                   style={styles.navitem}><MyText>Profile</MyText></TouchableOpacity>
             </View>
             <FlashMessage position="top"/>
+            <StatusBar translucent/>
         </NavigationContainer>
     );
 }

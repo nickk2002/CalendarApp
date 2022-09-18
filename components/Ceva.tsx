@@ -1,9 +1,14 @@
-import {ScrollView, StyleSheet, Text, View} from "react-native";
-import React from "react";
+import {Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import React, {useState} from "react";
 import {themeHook} from "./theme";
+import {DeleteButton} from "./TaskPopup/DeleteButton";
 
-function Header(props) {
-    return <MyText style={{fontWeight: "bold", fontSize: 19}}>{props.MyText}</MyText>
+function Header(props: { text?, placeholder?, onChangeText? }) {
+    return <MyText style={{fontWeight:"bold",fontSize:19}}>{props.text}</MyText>
+    if (props.text)
+        return <MyTextInput
+            style={{fontWeight: "bold", fontSize: 19}}>{props.text}</MyTextInput>
+    return <MyTextInput placeholder={props.placeholder} style={{fontWeight: "bold", fontSize: 19}}/>
 }
 
 
@@ -13,6 +18,23 @@ export function MyText(props: { style?, children, show? }) {
     if ('show' in props && !props.show)
         return <></>
     return <Text {...props} style={[{color: defaultColor}, props.style]}>{props.children}</Text>
+}
+
+export function MyTextInput(props: { style?, children?, show? }) {
+    const [theme] = themeHook();
+    const backgroundColorPlaceHolder = () => {
+        if (theme === 'white')
+            return 'grey'
+        return '#a7a7a7'
+    }
+    const defaultColor = theme === 'white' ? 'black' : 'white';
+    if ('show' in props && !props.show)
+        return <></>
+    if (props.children)
+        return <TextInput {...props} multiline placeholderTextColor={backgroundColorPlaceHolder()}
+                          style={[{color: defaultColor}, props.style]}>{props.children}</TextInput>
+    return <TextInput {...props} multiline placeholderTextColor={backgroundColorPlaceHolder()}
+                      style={[{color: defaultColor}, props.style]}/>
 }
 
 function Separator() {
@@ -28,12 +50,50 @@ function Italic(props: { children: React.ReactNode }) {
 }
 
 function Bold(props: { children: React.ReactNode }) {
-
     return (<MyText style={{fontWeight: 'bold'}}>{props.children}</MyText>)
 }
+
+
 export default function Dumnezeu() {
+    const [cuvinte, setCuvinte] = useState([]);
+
+    function CuvantMare(cuvant: { header?, text? }) {
+        return <>
+            <Separator/>
+            <TouchableOpacity onLongPress={() => console.log("Long press")}>
+                <View style={{flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                        {cuvant.header ?
+                            <Header text={cuvant.header}/> :
+                            <Header placeholder="Doamne ajuta-ma" onChangeText={(text) => cuvant.header = text}/>
+                        }
+                    </View>
+
+                    <DeleteButton isVisible onDelete={() => {
+                        deleteCuvant(cuvant)
+                    }} message={"Stergi cuvantul?"}/>
+                </View>
+                {cuvant.text ?
+                    <MyTextInput value={cuvant.text}/> :
+                    <MyTextInput placeholder="Doamne, iti multumesc" onChangeText={(text) => cuvant.text = text}/>
+                }
+            </TouchableOpacity>
+        </>
+    }
+
+    function addCuvant() {
+        cuvinte.push(
+            {}
+        );
+        setCuvinte([...cuvinte]);
+    }
+
+    function deleteCuvant(cuvant: { header?, text? }) {
+        setCuvinte(cuvinte.filter((other) => other.header != cuvant.header || other.text != cuvant.text));
+    }
+
     return (
-        <ScrollView style={{ marginRight: 10, marginLeft: 10,marginTop:10}}>
+        <ScrollView style={{marginRight: 10, marginLeft: 10, marginTop: 10}} snapToEnd>
             <View style={styles.rugaciunea}>
                 <MyText style={{fontSize: 16}}><MyText style={{fontWeight: "bold"}}>Doamne, </MyText>Iisuse Hristoase,
                     Fiul
@@ -44,7 +104,8 @@ export default function Dumnezeu() {
             <View style={{flexDirection: "row", flex: 1,}}>
                 <View style={styles.explicatie}>
                     <MyText style={{fontWeight: "bold"}}>Incredere</MyText>
-                    <MyText>Am incredere in Tine Domane. Orice s-ar intampla Tu stii totul deci este bine pentru mine.
+                    <MyText>Am incredere in Tine Domane. Orice s-ar intampla Tu stii totul deci este bine pentru
+                        mine.
                         Nu ma voi teme de nimic si orice necaz si suferinta as avea Iti multumesc Tie.Acest dar al
                         increderii ma face sa nu imi mai fie frica de moarte si sa fiu gata in orice secunda pentru ea.
                         Si daca se prabuseste avionul si ajung in mare si daca facem accident de masina si daca nu
@@ -59,7 +120,8 @@ export default function Dumnezeu() {
 
                 <View style={styles.explicatie}>
                     <MyText style={{fontWeight: "bold"}}>Smerenie</MyText>
-                    <MyText>Fii atent la cuvantul <MyText style={{fontStyle: "italic"}}>"pacatos" </MyText> pe care il
+                    <MyText>Fii atent la cuvantul <MyText style={{fontStyle: "italic"}}>"pacatos" </MyText> pe care
+                        il
                         spui.
                         Gandeste-te de
                         cate ori ai judecat pe ceilalti si de cate ori te-ai simtit foarte departe de Dumnezeu.
@@ -83,7 +145,7 @@ export default function Dumnezeu() {
                 </View>
             </View>
             <Separator/>
-            <Header MyText="Relatie cu Dumnezeu"/>
+            <Header text="Relatie cu Dumnezeu"/>
             <View>
                 <MyText>Nu uita niciodata de acest lucru esential. <MyText style={{fontWeight: "bold"}}> R</MyText>elatie
                     cu
@@ -106,7 +168,7 @@ export default function Dumnezeu() {
                 </MyText>
             </View>
             <Separator/>
-            <Header MyText="Minuni intamplate"/>
+            <Header text="Minuni intamplate"/>
             <View>
                 <MyText>1.Camera din Delft de pe Leeghwaterstraat era extraordinara si m-am bucurat tare mult de ea.
                     Mai ales cand cantam la pian. E o poza foarte frumoasa facuta de mami atunci. Imi amintesc de Max
@@ -160,7 +222,7 @@ export default function Dumnezeu() {
                 </MyText>
             </View>
             <Separator/>
-            <Header MyText="Rugaciuni imbarbatare"/>
+            <Header text="Rugaciuni imbarbatare"/>
             <View>
                 <MyText>1. <CuvantScurt
                     MyText="Slava tie Doamne, pentru tot.Pentru pacatele mele s-a intamplat asta."/>
@@ -189,7 +251,7 @@ export default function Dumnezeu() {
                     }/></MyText>
             </View>
             <Separator/>
-            <Header MyText="Citate foarte frumoase"/>
+            <Header text="Citate foarte frumoase"/>
 
             <View>
                 <MyText>1. <CuvantScurt
@@ -207,13 +269,13 @@ export default function Dumnezeu() {
                     MyText="Dumnezeu fara noi ramane tot Dumnezeu.Noi fara Dumnezeu sunt nimic."/></MyText>
             </View>
             <Separator/>
-            <Header MyText="Un cuvant oarecare"/>
+            <Header text="Un cuvant oarecare"/>
             <MyText>Doamne, stiu ca astazi am petrecut mult timp codand si nu m-am rugat neincetat asa cum as fi vrut.
                 Nu am vrut sa te supar. Am fost captivat de lucrul la aceasta aplicatie si am incercat sa Te implic cat
                 de mult
                 am putut in acest lucru.Te rog sa nu Te superi pe mine pacatosul</MyText>
             <Separator/>
-            <Header MyText="Cand pierd Harul"/>
+            <Header text="Cand pierd Harul"/>
             <Italic>Doamne, iti multumesc ca ma simt asa. Doar in starea asta pot sa vad cat de pacatos sunt. Inainte de
                 a citi
                 rugaciunea vreau sa ma incredintez cu toata inima si toata puterea mea ca Tu stii in ce stare ma aflu si
@@ -265,13 +327,17 @@ export default function Dumnezeu() {
                 Te rog, asculta rugaciunea mea si ma miluieste.
             </Bold>
             <Separator/>
-            <Header MyText="Rugaciune pentru Har"/>
+            <Header text="Rugaciune pentru Har"/>
             <Italic>
                 Doamne, sunt prea necurat pentru a primi Harul Tau, dar nadajduiesc catre Tine ca nu ma vei trece cu
                 vederea. Trimite Duhul Tau cel sfant peste mine ca sa nu ii mai smintesc pe ceilalti din jurul meu cu
                 pacatele mele, ci sa ii pot iubi din toata inima si sa Te pot lauda si slavi, ca Tu esti Dumnezeul meu
                 cel Iubit intru care eu imi incredintez viata.Amin.
             </Italic>
+            {cuvinte.map((item, index) => {
+                return <CuvantMare key={index} header={item.header} text={item.text}/>
+            })}
+            <Button title="Add new" onPress={addCuvant}/>
         </ScrollView>
     )
 }

@@ -134,3 +134,7 @@ export function getHourDifference(time1: Time, time2: Time) {
     const minuteDif = minutes2 - minutes1;
     return minuteDif / 60;
 }
+
+export function JSONEquals(a,b){
+    return JSON.stringify(a) === JSON.stringify(b)
+}

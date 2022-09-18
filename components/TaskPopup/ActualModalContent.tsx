@@ -150,7 +150,8 @@ export default function ActualContent(props: PopupSettings) {
         props.editTask.timeChanged = getToday();
         const other = [...tasks];
         setTasks(other);
-        // storeTasksAsync(other);
+        console.log("Start time is:",props.editTask.startTime)
+        storeTasksAsync(other);
         navigateBack();
     }
 
@@ -158,6 +159,7 @@ export default function ActualContent(props: PopupSettings) {
         return (props.editTask ?
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <TextInput
+                        autoFocus
                         editable={!props.editTask?.isFromCalendar}
                         onChangeText={(content) => props.editTask.header = content}
                         style={[styles.headerTextInput, {color: backgroundColor()}]}>
@@ -178,19 +180,17 @@ export default function ActualContent(props: PopupSettings) {
     function renderDescription() {
         return (props.editTask ?
                 <TextInput
-                    style={{paddingLeft: 25, padding: 10, fontSize: 15, maxHeight: 100, color: backgroundColor()}}
+                    style={{paddingLeft: 25, padding: 10, fontSize: 15,  color: backgroundColor()}}
                     multiline
                     scrollEnabled
-                    maxLength={30}
                     onChangeText={(text) => props.editTask.description = text}
                 > {props.editTask.description} </TextInput>
                 :
                 <TextInput
                     placeholderTextColor={backgroundColorPlaceHolder()}
-                    style={{paddingLeft: 25, padding: 10, fontSize: 15, maxHeight: 100, color: backgroundColor()}}
+                    style={{paddingLeft: 25, padding: 10, fontSize: 15,color: backgroundColor()}}
                     multiline
                     scrollEnabled
-                    maxLength={30}
                     onChangeText={setTaskDescription}
                     value={taskDescription}
                     placeholder="Description"/>

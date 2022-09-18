@@ -22,7 +22,7 @@ import clone from "just-clone";
 import {colors} from "../../colors";
 import DateTimePicker from "react-native-modal-datetime-picker";
 
-const timeHeight = 100;
+const timeHeight = 150;
 const spaceBetween = 2;
 const initialTimeHour = 7;
 
@@ -32,6 +32,7 @@ export default function RenderSchedule({navigation}) {
     const [givenTasks] = taskHook();
     const [currentDate, setCurrentDate] = calendarDayHook();
     const [tasks, setFilteredTasks] = filteredTasksHook();
+
 
     const [visiblePickDate, setVisiblePickDate] = useState(false);
     const sortAndFilterTasks = () => {
@@ -64,6 +65,7 @@ export default function RenderSchedule({navigation}) {
         for (const task of tasks) {
             if (!compareTime(previousHour, task.startTime)) {
                 const hourCloned = clone(previousHour);
+
                 toRender.push(
                     <View key={previousHour.minutes + previousHour.hour * 60}
                           style={{
@@ -129,7 +131,6 @@ export default function RenderSchedule({navigation}) {
             if (index + 1 == hours.length)
                 return;
             const nextHour = hours[index + 1];
-            console.log(hour.hour * 60 + hour.minutes);
             timestamps.push(
                 <View key={hour.hour * 60 + hour.minutes}
                       style={{flexDirection: "column", height: timeHeight * getHourDifference(hour, nextHour)}}>
