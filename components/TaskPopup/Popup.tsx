@@ -2,7 +2,7 @@ import React from "react";
 import {Modal, TouchableWithoutFeedback, View} from "react-native";
 import {CalendarItemType} from "../Schedule/CalendarItem";
 
-import {themeHook} from "../theme";
+import {themeHook} from "../global";
 import ActualContent from "./ActualModalContent";
 import {navigateBack} from "../../RootNavigation";
 import {Time} from "../../Utils";

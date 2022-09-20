@@ -4,7 +4,7 @@ import {colors} from "../../colors";
 import HourIntervalDisplay, {TimeInterval} from "./HourIntervalDisplay";
 import {Time} from "../../Utils";
 import {MyText} from "../Ceva";
-import {themeHook} from "../theme";
+import {themeHook} from "../global";
 
 export interface CalendarItemType extends TimeInterval {
     color?: string;

@@ -4,7 +4,7 @@
     "slug": "calendarapp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/calendar64.png",
+    "icon": "./assets/calendar_good_icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -22,7 +22,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/calendar64.png",
+        "foregroundImage": "./assets/calendar_good_icon.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.nickk2002.calendarapp"

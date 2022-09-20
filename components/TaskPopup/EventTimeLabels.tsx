@@ -1,4 +1,4 @@
-import {themeHook} from "../theme";
+import {themeHook} from "../global";
 import {StyleSheet, TouchableOpacity, View} from "react-native";
 import {MyText} from "../Ceva";
 import {colors} from "../../colors";

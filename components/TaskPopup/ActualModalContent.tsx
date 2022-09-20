@@ -19,7 +19,7 @@ import {
 
 import {MyText} from "../Ceva";
 import React, {useEffect, useRef, useState} from "react";
-import {calendarDayHook, filteredTasksHook, storeTasksAsync, taskHook, themeHook} from "../theme";
+import {calendarDayHook, filteredTasksHook, storeTasksAsync, taskHook, themeHook} from "../global";
 import {colors} from "../../colors";
 import {CalendarItemType} from "../Schedule/CalendarItem";
 import {PopupSettings} from "./Popup";

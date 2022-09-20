@@ -3,7 +3,15 @@ import React, {useEffect, useState} from 'react';
 import Ceva, {MyText} from "./components/Ceva"
 import Popup from "./components/TaskPopup/Popup";
 import RenderSchedule from "./components/Schedule/RenderSchedule";
-import {storeTasksAsync, taskHook, tasksStorageKey, themeHook, themeStorageKey} from "./components/theme";
+import {
+    cuvinteHook,
+    cuvinteStorageKey,
+    storeTasksAsync,
+    taskHook,
+    tasksStorageKey,
+    themeHook,
+    themeStorageKey
+} from "./components/global";
 import Profile from "./components/Profile";
 import {readXMLRequest} from "./calendarParser";
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
@@ -15,6 +23,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import {StatusBar} from "expo-status-bar";
 import {CalendarItemType} from "./components/Schedule/CalendarItem";
 import {JSONEquals} from "./Utils";
+import WordModal from "./components/WordModal";
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
@@ -23,7 +32,8 @@ export default function App() {
     const [readFromLocalStorage, setReadFromLocalStorage] = useState(false);
     const [theme] = themeHook();
     const [, setTasks] = taskHook();
-    const [, setTheme] = themeHook()
+    const [, setTheme] = themeHook();
+    const [, setCuvinte] = cuvinteHook();
 
     const [isLoadingComplete, setLoadingComplete] = useState(false);
     useEffect(() => {
@@ -39,6 +49,7 @@ export default function App() {
                         AsyncStorage.setItem(themeStorageKey, "dark")
                     }
                     restoreTodosFromAsync();
+                    restoreCuvinteFromAsync();
                 } catch
                     (e) {
                     console.warn(e);
@@ -48,7 +59,6 @@ export default function App() {
                     setLoadingComplete(true);
                 }
             }
-
             prepare();
         }, []
     );
@@ -80,7 +90,7 @@ export default function App() {
                 if (currentTasks.filter(item => JSON.stringify(item) === JSON.stringify(calendarItem)).length == 0) {
                     console.log("Push Item", calendarItem);
                     const before = currentTasks.filter(item => JSONEquals(item.startTime, calendarItem.startTime) && JSONEquals(item.endTime, calendarItem.endTime)
-                                    && item.isFromCalendar == calendarItem.isFromCalendar);
+                        && item.isFromCalendar == calendarItem.isFromCalendar);
                     console.log(before);
                     if (before.length > 0) {
                         // save description
@@ -117,7 +127,19 @@ export default function App() {
                 console.warn('Error restoring todos from async');
                 console.warn(err);
             });
-    };
+    }
+
+    function restoreCuvinteFromAsync() {
+        console.log("I am here from cuvinte async restoring");
+
+        AsyncStorage.getItem(cuvinteStorageKey).then(cuvinte => {
+            if(cuvinte !== null)
+                setCuvinte(JSON.parse(cuvinte));
+        }).catch(() => {
+            console.warn("Error restoring cuvinte from async");
+        })
+    }
+
     const navTheme = {
         ...DefaultTheme,
         colors: {
@@ -172,6 +194,7 @@ export default function App() {
                 </Stack.Group>
                 <Stack.Group screenOptions={{presentation: 'transparentModal'}}>
                     <Stack.Screen name="AddTask" component={Popup} options={{headerShown: false}}/>
+                    <Stack.Screen name="AddWord" component={WordModal} options={{headerShown: false}}/>
                 </Stack.Group>
             </Stack.Navigator>
             <View style={styles.nav}>

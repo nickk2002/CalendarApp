@@ -1,7 +1,7 @@
 import {Pressable, StyleSheet, View} from "react-native";
 import React, {useState} from "react";
 import {MyText} from "./Ceva";
-import {themeHook, themeStorageKey} from "./theme";
+import {themeHook, themeStorageKey} from "./global";
 import {Entypo, Ionicons} from "@expo/vector-icons";
 import {colors} from "../colors";
 import {SafeAreaView} from "react-native-safe-area-context";

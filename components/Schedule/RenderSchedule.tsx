@@ -13,7 +13,7 @@ import {
 
 import CalendarItem from "./CalendarItem";
 import {MyText} from "../Ceva";
-import {calendarDayHook, filteredTasksHook, taskHook, themeHook} from "../theme";
+import {calendarDayHook, filteredTasksHook, taskHook, themeHook} from "../global";
 import {navigate} from "../../RootNavigation";
 
 import {AntDesign, Ionicons} from '@expo/vector-icons';
