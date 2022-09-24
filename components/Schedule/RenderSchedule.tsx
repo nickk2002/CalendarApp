@@ -1,4 +1,4 @@
-import {ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
+import {ScrollView, StyleSheet, Switch, TouchableOpacity, View} from "react-native";
 import {
     compareTime,
     formatHourTime,
@@ -21,10 +21,11 @@ import React, {useEffect, useState} from "react";
 import clone from "just-clone";
 import {colors} from "../../colors";
 import DateTimePicker from "react-native-modal-datetime-picker";
+import Slider from "@react-native-community/slider";
 
-const timeHeight = 150;
 const spaceBetween = 2;
 const initialTimeHour = 7;
+const normalTaskHeight = 120;
 
 export default function RenderSchedule({navigation}) {
 
@@ -33,8 +34,10 @@ export default function RenderSchedule({navigation}) {
     const [currentDate, setCurrentDate] = calendarDayHook();
     const [tasks, setFilteredTasks] = filteredTasksHook();
 
-
     const [visiblePickDate, setVisiblePickDate] = useState(false);
+    const [isUsingFreeTime, setIsUsingFreeTime] = useState(false);
+    const [taskHeight,setTaskHeight] = useState(120);
+
     const sortAndFilterTasks = () => {
         const filtered = givenTasks.filter((task) =>
             task.startTime.month === currentDate.month && currentDate.day === task.startTime.day
@@ -51,19 +54,19 @@ export default function RenderSchedule({navigation}) {
         setFilteredTasks(filtered);
     }
     useEffect(sortAndFilterTasks, [givenTasks, currentDate]);
-
     useEffect(() => {
         const dayName = prettyPrintDayName(currentDate);
         navigation.setOptions({
             title: dayName
         })
     }, [currentDate, navigation])
+
     const renderTasks = (timeHeight: number, spaceBetween: number) => {
         const toRender = [];
         let previousHour: Time = getTimeWithThisHour(currentDate, initialTimeHour);
 
         for (const task of tasks) {
-            if (!compareTime(previousHour, task.startTime)) {
+            if (!compareTime(previousHour, task.startTime) && isUsingFreeTime) {
                 const hourCloned = clone(previousHour);
 
                 toRender.push(
@@ -90,10 +93,11 @@ export default function RenderSchedule({navigation}) {
             previousHour = clone(previousHour)
             previousHour.hour = task.endTime.hour;
             previousHour.minutes = task.endTime.minutes;
+            const computedHeight = isUsingFreeTime ? getHourDifference(task.startTime, task.endTime) * timeHeight : normalTaskHeight;
             toRender.push(
                 <View key={JSON.stringify(task)}
                       style={{
-                          height: getHourDifference(task.startTime, task.endTime) * timeHeight,
+                          height: computedHeight,
                           width: '100%',
                           paddingBottom: spaceBetween,
                       }}>
@@ -119,6 +123,8 @@ export default function RenderSchedule({navigation}) {
     }
 
     function renderTime() {
+        if(!isUsingFreeTime)
+            return;
         const timestamps = [];
         const hours: Time[] = [getTimeWithThisHour(currentDate, initialTimeHour)];
         tasks.forEach(task => {
@@ -133,7 +139,7 @@ export default function RenderSchedule({navigation}) {
             const nextHour = hours[index + 1];
             timestamps.push(
                 <View key={hour.hour * 60 + hour.minutes}
-                      style={{flexDirection: "column", height: timeHeight * getHourDifference(hour, nextHour)}}>
+                      style={{flexDirection: "column", height: taskHeight * getHourDifference(hour, nextHour)}}>
                     <View
                         style={{
                             flexDirection: "row",
@@ -218,12 +224,37 @@ export default function RenderSchedule({navigation}) {
                     <AntDesign name="arrowright" size={24} color={theme == 'white' ? 'black' : colors.textgrey}/>
                 </TouchableOpacity>
             </View>
+            <View style={{flexDirection:'row'}}>
+                <View style={{flexDirection:'column',marginRight:20}}>
+                    <MyText style={{fontSize: 15, fontWeight: 'bold'}}>Show free time</MyText>
+                    <Switch style={{alignSelf: 'flex-start'}}
+                            trackColor={{false: "#767577", true: "#81b0ff"}}
+                            thumbColor={isUsingFreeTime ? "#033ebc" : "#f4f3f4"}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={() => setIsUsingFreeTime(!isUsingFreeTime)}
+                            value={isUsingFreeTime}
+                    />
+                </View>
+                <View>
+                    <MyText style={{fontSize: 15, fontWeight: 'bold'}}>Task Height</MyText>
+                    <Slider
+                        style={{marginLeft:0,width: 150, height: 40,transform:[{scaleY:1.2},{scaleX:1.2}]}}
+                        minimumValue={60}
+                        maximumValue={200}
+                        onValueChange={(value)=>setTaskHeight(value)}
+                        step={10}
+                        tapToSeek
+                        minimumTrackTintColor={theme == 'white'? "#033ebc": "#033ebc"}
+                        maximumTrackTintColor={theme == 'white'?"#000000":"#FFFFFF"}
+                    />
+                </View>
+            </View>
             <ScrollView>
                 {tasks.length > 0 ?
                     <View style={{flex: 1, flexDirection: 'row', marginTop: 20, marginLeft: 5}}>
                         {renderTime()}
                         <View style={{flex: 1}}>
-                            {renderTasks(timeHeight, spaceBetween)}
+                            {renderTasks(taskHeight, spaceBetween)}
                         </View>
                     </View>
                     :

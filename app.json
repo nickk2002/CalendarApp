@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "CalendarApp",
-    "slug": "calendarapp",
+    "name": "PlanApp",
+    "slug": "planapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/calendar_good_icon.png",

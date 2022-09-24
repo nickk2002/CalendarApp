@@ -13,6 +13,7 @@
 - [ ] Different colors and same color for a course
 - [X] Status bar color for dark mode
 - [X] Default theme is `white`
+- [ ] Status bar for `white` mode should be `white`
 - [X] Status bar translucent
 - [X] Make 30 Minutes Time interval look ok
 - [ ] Update start time to `7 30`
@@ -22,10 +23,13 @@
 - [ ] less than one hour tasks look bad in the UI
 
 ### Features
-- [ ] Refresh calendar button
+- [ ] Refresh calendar button with last refresh date
+- [ ] Do something with things that appear in calendar but I do not want to show them
+- [ ] Calendar View without free time
+- [ ] Task view for today
 - [ ] Add link to the building name
-- [ ] Exam fix names
-- [ ] Wait for calendar to load in main screen
+- [X] Exam fix names
+- [X] Wait for calendar to load in main screen
 - [X] Show location in task view
 - [X] Scroll Modal Edit Task
 - [X] Persistent location in storage Hope
@@ -35,4 +39,8 @@
 - [ ] dark mode/light mode preference save in local storage
 - [X] Bug when creating a task at the end of the day it is not full width
 - [ ] Repeat functionality for events
-- [ ] Sa adaug alte rugaciuni scriind direct pe tel
+- [X] Sa adaug alte rugaciuni scriind direct pe tel
+
+### Code
+- [X] Fix `ts` issues with placeholder on `MyText`
+- [ ] Remove unused dependencies

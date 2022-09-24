@@ -37,15 +37,13 @@ const Popup = ({route}) => {
             transparent
         >
             <View style={{flex: 1}}>
-                <View style={{flex: 1}}>
-                    <TouchableWithoutFeedback onPress={pressedOutside}>
-                        <View style={{
-                            flex: 0.6,
-                            backgroundColor: theme == 'white' ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0.6)"
-                        }}/>
-                    </TouchableWithoutFeedback>
-                    <ActualContent editTask={editTask} startTime={startDate} endTime={endDate}/>
-                </View>
+                <TouchableWithoutFeedback onPress={pressedOutside}>
+                    <View style={{
+                        flex: 0.6,
+                        backgroundColor: theme == 'white' ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0.6)"
+                    }}/>
+                </TouchableWithoutFeedback>
+                <ActualContent editTask={editTask} startTime={startDate} endTime={endDate}/>
             </View>
         </Modal>
     )
