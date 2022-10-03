@@ -1,7 +1,7 @@
 import {readXMLRequest} from "../../calendarParser";
-import {CalendarItemType} from "../Schedule/CalendarItem";
 import {JSONEquals} from "../../Utils";
 import clone from "just-clone";
+import {CalendarItemType} from "../Schedule/CalendarItemType";
 
 export default function webRequest(parsedTasks,callback:()=>any, callbackNewTasks: (newTasks) => any,fail:()=>any) {
     console.log("Starting web request")

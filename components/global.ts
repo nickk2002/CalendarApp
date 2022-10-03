@@ -1,6 +1,6 @@
 import GlobalStore from "react-native-global-state-hooks";
-import {parseIntoTimeObject} from "../Utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {Time} from "../Time";
 
 export const tasksStorageKey = "TASKS"
 export const themeStorageKey = "Theme"
@@ -19,8 +19,8 @@ export const cuvinteHook = cuvinteStore.getHook()
 const filteredTaskStore = new GlobalStore([])
 export const filteredTasksHook = filteredTaskStore.getHook()
 
-const currentDay = new GlobalStore(parseIntoTimeObject(Date()));
-export const calendarDayHook = currentDay.getHook()
+const currentDay = new GlobalStore(Time.today());
+export const calendarDayHook= currentDay.getHook()
 
 const lastRefreshDay = new GlobalStore(new Date());
 export const lastRefreshDateHook = lastRefreshDay.getHook();

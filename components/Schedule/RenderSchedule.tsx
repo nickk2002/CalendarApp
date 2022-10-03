@@ -1,15 +1,10 @@
 import {ScrollView, StyleSheet, Switch, TouchableOpacity, View} from "react-native";
 import {
-    compareTime,
     dateFormatString,
-    formatHourTime,
     getDayMonth,
     getHourDifference,
-    getTimeWithThisHour,
-    parseIntoJsDateFromTime,
-    parseIntoTimeObject,
     prettyPrintDayName,
-    Time
+
 } from "../../Utils";
 
 import dateFormat from "dateformat";
@@ -17,7 +12,6 @@ import CalendarItem from "./CalendarItem";
 import {MyText} from "../Ceva";
 import {
     calendarDayHook,
-    filteredTasksHook,
     lastRefreshDateHook,
     storeLastCalendarRefreshDate,
     storeTasksAsync,
@@ -28,11 +22,11 @@ import {navigate} from "../../RootNavigation";
 
 import {AntDesign, Ionicons} from '@expo/vector-icons';
 import React, {useEffect, useState} from "react";
-import clone from "just-clone";
 import {colors} from "../../colors";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import Slider from "@react-native-community/slider";
 import webRequest from "../TaskPopup/webRequestCalendar";
+import {Time} from "../../Time";
 
 const spaceBetween = 2;
 const initialTimeHour = 7;
@@ -74,7 +68,8 @@ export default function RenderSchedule({navigation}) {
     useEffect(() => loadCalendar(tasks), []);
     const sortAndFilterTasks = () => {
         const filtered = givenTasks.filter((task) =>
-            task.startTime.month === currentDate.month && currentDate.day === task.startTime.day
+            task.startTime.month === currentDate.month && currentDate.day === task.startTime.day &&
+            task.startTime.year == currentDate.year
         );
         filtered.sort((task1, task2) => {
             const diff = getHourDifference(task1.startTime, task2.startTime);
@@ -84,12 +79,12 @@ export default function RenderSchedule({navigation}) {
                 return 0;
             return 1;
         });
-        console.log("Filtered tasks tasks", filtered.length,"Total",givenTasks.length);
+        console.log("Filtered tasks tasks", filtered.length, "Total", givenTasks.length);
         setFilteredTasks(filtered);
     }
     useEffect(sortAndFilterTasks, [givenTasks, currentDate]);
     useEffect(() => {
-        const dayName = prettyPrintDayName(currentDate);
+        const dayName = prettyPrintDayName(currentDate.convertToDate().toString());
         navigation.setOptions({
             title: dayName
         })
@@ -97,11 +92,10 @@ export default function RenderSchedule({navigation}) {
 
     const renderTasks = (timeHeight: number, spaceBetween: number) => {
         const toRender = [];
-        let previousHour: Time = getTimeWithThisHour(currentDate, initialTimeHour);
-
+        let previousHour: Time = currentDate.withHour(initialTimeHour);
         for (const task of tasks) {
-            if (!compareTime(previousHour, task.startTime) && isUsingFreeTime) {
-                const hourCloned = clone(previousHour);
+            if (!previousHour.equals(task.startTime) && isUsingFreeTime) {
+                const hourCloned = Time.createTime(previousHour);
                 toRender.push(
                     <View key={previousHour.minutes + previousHour.hour * 60}
                           style={{
@@ -123,7 +117,7 @@ export default function RenderSchedule({navigation}) {
                     </View>
                 );
             }
-            previousHour = clone(previousHour)
+            previousHour = Time.createTime(previousHour)
             previousHour.hour = task.endTime.hour;
             previousHour.minutes = task.endTime.minutes;
             const computedHeight = isUsingFreeTime ? getHourDifference(task.startTime, task.endTime) * timeHeight : normalTaskHeight;
@@ -159,7 +153,7 @@ export default function RenderSchedule({navigation}) {
         if (!isUsingFreeTime)
             return;
         const timestamps = [];
-        const hours: Time[] = [getTimeWithThisHour(currentDate, initialTimeHour)];
+        const hours: Time[] = [currentDate.withHour(initialTimeHour)];
         tasks.forEach(task => {
             const last = hours[hours.length - 1];
             if (last.hour !== task.startTime.hour || last.minutes !== task.startTime.minutes)
@@ -177,7 +171,7 @@ export default function RenderSchedule({navigation}) {
                         flexDirection: "row",
                         alignItems: "center"
                     }}>
-                        <MyText style={styles.time}>{formatHourTime(hour)} </MyText>
+                        <MyText style={styles.time}>{hour.formatHourTime()} </MyText>
                         <View style={{width: 10, height: 1, backgroundColor: colors.textgrey}}/>
                     </View>
                 </View>
@@ -192,7 +186,7 @@ export default function RenderSchedule({navigation}) {
                         flexDirection: "row",
                         alignItems: "center"
                     }}>
-                    <MyText style={styles.time}>{formatHourTime(hour)} </MyText>
+                    <MyText style={styles.time}>{hour.formatHourTime()} </MyText>
                     <View style={{width: 10, height: 1, backgroundColor: colors.textgrey}}/>
                 </View>
             </View>
@@ -208,10 +202,10 @@ export default function RenderSchedule({navigation}) {
         <View style={{margin: 5, marginTop: 10, flex: 1}}>
             <View style={{flexDirection: 'row', alignSelf: 'center', marginBottom: 10}}>
                 <TouchableOpacity onPress={() => {
-                    const jsDate = parseIntoJsDateFromTime(currentDate);
+                    const jsDate = currentDate.convertToDate();
                     const tomorrow = jsDate.getDate() - 1;
                     jsDate.setDate(tomorrow);
-                    setCurrentDate(parseIntoTimeObject(jsDate));
+                    setCurrentDate(Time.parseTime(jsDate));
                 }} style={{justifyContent: 'center', paddingHorizontal: 10}}>
                     <AntDesign name="arrowleft" size={24} color={theme == 'white' ? 'black' : colors.textgrey}/>
                 </TouchableOpacity>
@@ -221,23 +215,23 @@ export default function RenderSchedule({navigation}) {
                             fontSize: 25,
                             fontWeight: "bold",
                             textAlign: "center"
-                        }}> {getDayMonth(parseIntoJsDateFromTime(currentDate))}
+                        }}> {getDayMonth(currentDate.convertToDate())}
                     </MyText>
                 </TouchableOpacity>
                 <DateTimePicker isVisible={visiblePickDate}
-                                date={new Date(parseIntoJsDateFromTime(currentDate))}
+                                date={currentDate.convertToDate()}
                                 onConfirm={(date) => {
-                                    setCurrentDate(parseIntoTimeObject(date));
+                                    setCurrentDate(Time.parseTime(date));
                                     setVisiblePickDate(false);
                                 }}
 
                                 onCancel={() => setVisiblePickDate(false)}/>
 
                 <TouchableOpacity onPress={() => {
-                    const jsDate = parseIntoJsDateFromTime(currentDate);
+                    const jsDate = currentDate.convertToDate();
                     const tomorrow = jsDate.getDate() + 1;
                     jsDate.setDate(tomorrow);
-                    setCurrentDate(parseIntoTimeObject(jsDate));
+                    setCurrentDate(Time.parseTime(jsDate));
                 }} style={{justifyContent: 'center', paddingHorizontal: 10}}>
                     <AntDesign name="arrowright" size={24} color={theme == 'white' ? 'black' : colors.textgrey}/>
                 </TouchableOpacity>

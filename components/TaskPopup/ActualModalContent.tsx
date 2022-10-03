@@ -3,25 +3,12 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import dateFormat from "dateformat";
-import {
-    dateFormatString,
-    displayTimeToDateFormat,
-    formatHourTime,
-    getHourDifference,
-    getTimeWithThisHour,
-    getToday,
-    parseIntoJsDateFromTime,
-    parseIntoTimeObject,
-    prettyPrintDifferenceDate,
-    prettyPrintTime,
-    Time
-} from "../../Utils";
+import {dateFormatString, getHourDifference, prettyPrintDifferenceDate} from "../../Utils";
 
 import {MyText} from "../Ceva";
 import React, {useEffect, useRef, useState} from "react";
 import {calendarDayHook, filteredTasksHook, storeTasksAsync, taskHook, themeHook} from "../global";
 import {colors} from "../../colors";
-import {CalendarItemType} from "../Schedule/CalendarItem";
 import {PopupSettings} from "./Popup";
 import EventTimeLabels from "./EventTimeLabels";
 import EventOption from "./EventOptions";
@@ -30,6 +17,8 @@ import {DeleteButton} from "./DeleteButton";
 import {navigateBack} from "../../RootNavigation";
 import FlashMessage from "react-native-flash-message";
 import clone from "just-clone";
+import {CalendarItemType} from "../Schedule/CalendarItemType";
+import {Time} from "../../Time";
 
 
 export default function ActualContent(props: PopupSettings) {
@@ -46,8 +35,8 @@ export default function ActualContent(props: PopupSettings) {
 
     const [isDatePickerVisibleStart, setStartDateVisibility] = useState(false);
     const [isDatePickerVisibleEnd, setDatePickerVisibilityEnd] = useState(false);
-    const [startTime, setStartTime]: [string, any] = useState(parseIntoJsDateFromTime(getTimeWithThisHour(getCalendarDay, 10)).toString());
-    const [endTime, setEndTime]: [string, any] = useState(parseIntoJsDateFromTime(getTimeWithThisHour(getCalendarDay, 11)).toString());
+    const [startTime, setStartTime]: [string, any] = useState(getCalendarDay.withHour(10).convertToDate().toString());
+    const [endTime, setEndTime]: [string, any] = useState(getCalendarDay.withHour(11).convertToDate().toString());
 
     const [taskColor, setTaskColor] = useState(randomColor());
     const [isColorPicking, setColorPicking] = useState(false);
@@ -64,14 +53,14 @@ export default function ActualContent(props: PopupSettings) {
     }
     useEffect(() => {
         if (props.startTime) {
-            setStartTime(parseIntoJsDateFromTime(props.startTime));
-            setEndTime(parseIntoJsDateFromTime(props.endTime));
+            setStartTime(props.startTime.convertToDate());
+            setEndTime(props.endTime.convertToDate());
         }
     }, [])
     useEffect(() => {
         if (props.editTask) {
-            setStartTime(parseIntoJsDateFromTime(props.editTask.startTime).toString());
-            setEndTime(parseIntoJsDateFromTime(props.editTask.endTime).toString());
+            setStartTime((props.editTask.startTime.convertToDate()).toString());
+            setEndTime((props.editTask.endTime.convertToDate()).toString());
         }
     })
 
@@ -79,7 +68,7 @@ export default function ActualContent(props: PopupSettings) {
         if (getHourDifference(start, end) < 0) {
             flashMessage.current.showMessage({
                 message: "Start time should be smaller than end time",
-                description: `Task starts at ${formatHourTime(start)} and ends at ${formatHourTime(end)}`,
+                description: `Task starts at ${start.formatHourTime()} and ends at ${end.formatHourTime()}`,
                 type: "danger"
             })
             return false;
@@ -89,7 +78,7 @@ export default function ActualContent(props: PopupSettings) {
             if (getHourDifference(otherTask.startTime, start) > 0 && getHourDifference(start, otherTask.endTime) > 0) {
                 flashMessage.current.showMessage({
                     message: "Start time overlaps with another task " + otherTask.header,
-                    description: `${formatHourTime(start)} overlaps with [${formatHourTime(otherTask.startTime)}, ${formatHourTime(otherTask.endTime)}]`,
+                    description: `${start.formatHourTime()} overlaps with [${otherTask.startTime.formatHourTime()}, ${otherTask.endTime.formatHourTime()}]`,
                     type: "danger"
                 })
                 return false;
@@ -97,7 +86,7 @@ export default function ActualContent(props: PopupSettings) {
             if (getHourDifference(otherTask.startTime, end) > 0 && getHourDifference(end, otherTask.endTime) > 0) {
                 flashMessage.current.showMessage({
                     message: "End time overlaps with another task " + otherTask.header,
-                    description: `${formatHourTime(end)} overlaps with [${formatHourTime(otherTask.startTime)}, ${formatHourTime(otherTask.endTime)}]`,
+                    description: `${end.formatHourTime()} overlaps with [${otherTask.startTime.formatHourTime()}, ${otherTask.endTime.formatHourTime()}]`,
                     type: "danger"
                 })
                 return false;
@@ -105,7 +94,7 @@ export default function ActualContent(props: PopupSettings) {
             if (getHourDifference(otherTask.startTime, start) < 0 && getHourDifference(end, otherTask.endTime) < 0) {
                 flashMessage.current.showMessage({
                     message: "Start time and end time includes " + otherTask.header,
-                    description: `[${formatHourTime((start))} ${formatHourTime(end)}] includes [${formatHourTime(otherTask.startTime)}, ${formatHourTime(otherTask.endTime)}]`,
+                    description: `[${(start.formatHourTime())} ${end.formatHourTime()}] includes [${otherTask.startTime.formatHourTime()}, ${otherTask.endTime.formatHourTime()}]`,
                     type: "danger"
                 })
                 return false;
@@ -116,18 +105,18 @@ export default function ActualContent(props: PopupSettings) {
 
 
     function createTask() {
-        const start = parseIntoTimeObject(startTime);
-        const end = parseIntoTimeObject(endTime);
+        const start = Time.parseTime(startTime);
+        const end = Time.parseTime(endTime);
         if (!validateStartTimes(start, end)) {
             return;
         }
         const newTask: CalendarItemType = {
             header: taskHeader,
             description: taskDescription,
-            startTime: parseIntoTimeObject(startTime),
-            endTime: parseIntoTimeObject(endTime),
+            startTime: start,
+            endTime: end,
             color: taskColor,
-            timeChanged: getToday()
+            timeChanged: Time.today()
         }
         console.log("Add task");
 
@@ -147,10 +136,10 @@ export default function ActualContent(props: PopupSettings) {
             props.editTask.endTime = editingTaskCopy.endTime;
             return;
         }
-        props.editTask.timeChanged = getToday();
+        props.editTask.timeChanged = Time.today();
         const other = [...tasks];
         setTasks(other);
-        console.log("Start time is:",props.editTask.startTime)
+        console.log("Start time is:", props.editTask.startTime)
         storeTasksAsync(other);
         navigateBack();
     }
@@ -180,7 +169,7 @@ export default function ActualContent(props: PopupSettings) {
     function renderDescription() {
         return (props.editTask ?
                 <TextInput
-                    style={{paddingLeft: 25, padding: 10, fontSize: 15,  color: backgroundColor()}}
+                    style={{paddingLeft: 25, padding: 10, fontSize: 15, color: backgroundColor()}}
                     multiline
                     scrollEnabled
                     onChangeText={(text) => props.editTask.description = text}
@@ -188,7 +177,7 @@ export default function ActualContent(props: PopupSettings) {
                 :
                 <TextInput
                     placeholderTextColor={backgroundColorPlaceHolder()}
-                    style={{paddingLeft: 25, padding: 10, fontSize: 15,color: backgroundColor()}}
+                    style={{paddingLeft: 25, padding: 10, fontSize: 15, color: backgroundColor()}}
                     multiline
                     scrollEnabled
                     onChangeText={setTaskDescription}
@@ -204,26 +193,26 @@ export default function ActualContent(props: PopupSettings) {
                 color: colors.textgrey
             }}>
                 Last
-                Changed {prettyPrintTime(props.editTask.timeChanged)} </MyText>)
+                Changed {props.editTask.timeChanged.prettyPrintTime()} </MyText>)
         }
         return <></>
     }
 
     function handleConfirmStart(date) {
         setStartDateVisibility(false);
-        props.editTask ? props.editTask.startTime = parseIntoTimeObject(date) : setStartTime(date);
+        props.editTask ? props.editTask.startTime = Time.parseTime(date) : setStartTime(date);
     }
 
     function handleConfirmEnd(date: Date) {
         setDatePickerVisibilityEnd(false);
-        props.editTask ? props.editTask.endTime = parseIntoTimeObject(date) : setEndTime(date);
+        props.editTask ? props.editTask.endTime = Time.parseTime(date) : setEndTime(date);
     }
 
     const displayInitialStartDate = () => {
-        return props.editTask ? displayTimeToDateFormat(props.editTask.startTime) : dateFormat(startTime, dateFormatString);
+        return props.editTask ? props.editTask.startTime.toDateFormat() : dateFormat(startTime, dateFormatString);
     }
     const displayInitialEndDate = () => {
-        return props.editTask ? displayTimeToDateFormat(props.editTask.endTime) : dateFormat(endTime, dateFormatString);
+        return props.editTask ? props.editTask.endTime.toDateFormat() : dateFormat(endTime, dateFormatString);
     }
     return (
         <ScrollView style={[styles.actualView, {backgroundColor: theme === 'white' ? "#FFFFFF" : "#2f2f2f"}]}>

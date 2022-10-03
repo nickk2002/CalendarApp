@@ -1,7 +1,7 @@
 // noinspection JSObjectNullOrUndefined
 
-import {CalendarItemType} from "./components/Schedule/CalendarItem";
-import {parseIntoTimeObject} from "./Utils";
+import {CalendarItemType} from "./components/Schedule/CalendarItemType";
+import {Time} from "./Time";
 
 
 function parseDate(date: string) {
@@ -14,7 +14,7 @@ function parseDate(date: string) {
     const hour = secondPart.substring(0, 2);
     const minute = secondPart.substring(2, 4);
     const parsedDate = new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), 0);
-    return parseIntoTimeObject(parsedDate);
+    return Time.parseTime(parsedDate);
 }
 
 

@@ -1,11 +1,11 @@
 import React from "react";
 import {Modal, TouchableWithoutFeedback, View} from "react-native";
-import {CalendarItemType} from "../Schedule/CalendarItem";
 
 import {themeHook} from "../global";
 import ActualContent from "./ActualModalContent";
 import {navigateBack} from "../../RootNavigation";
-import {Time} from "../../Utils";
+import {CalendarItemType} from "../Schedule/CalendarItemType";
+import {Time} from "../../Time";
 
 
 export type PopupSettings = {
