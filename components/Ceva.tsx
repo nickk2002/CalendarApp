@@ -10,9 +10,9 @@ import {
     View
 } from "react-native";
 import React from "react";
-import {cuvinteHook, storeCuvinteAsync, themeHook} from "./global";
+import {cuvinteHook, storeCuvinteAsync, themeHook} from "../src/global/global";
 import {DeleteButton} from "./TaskPopup/DeleteButton";
-import {navigate} from "../RootNavigation";
+import {navigate} from "./RootNavigation";
 
 function Header(props: { text?, placeholder?, onChangeText? }) {
     return <MyText style={{fontWeight: "bold", fontSize: 19}}>{props.text}</MyText>

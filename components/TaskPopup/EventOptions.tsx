@@ -1,7 +1,7 @@
 import {TouchableOpacity, View} from "react-native";
 import {MaterialIcons} from "@expo/vector-icons";
 import {MyText} from "../Ceva";
-import {colors} from "../../colors";
+import {colors} from "../../src/global/colors";
 import React from "react";
 
 export default function EventOption(props: { name: string, iconName, disableLine?: boolean }) {

@@ -1,6 +1,6 @@
 import {Alert, TouchableOpacity, View} from "react-native";
 import {MaterialIcons} from "@expo/vector-icons";
-import {colors} from "../../colors";
+import {colors} from "../../src/global/colors";
 import React from "react";
 
 export function DeleteButton(props: { isVisible: boolean, onDelete, message: string }) {

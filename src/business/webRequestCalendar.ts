@@ -1,9 +1,9 @@
-import {readXMLRequest} from "../../calendarParser";
-import {JSONEquals} from "../../Utils";
+import {readXMLRequest} from "./calendarParser";
+import {JSONEquals} from "../utils/Utils";
 import clone from "just-clone";
-import {CalendarItemType} from "../Schedule/CalendarItemType";
+import {CalendarItemType} from "../../components/Schedule/CalendarItemType";
 
-export default function webRequest(parsedTasks,callback:()=>any, callbackNewTasks: (newTasks) => any,fail:()=>any) {
+export default function webRequest(parsedTasks, callback: () => any, callbackNewTasks: (newTasks) => any, fail: () => any) {
     console.log("Starting web request")
     readXMLRequest((tasksFromCalendar) => {
         let currentTasks: CalendarItemType[] = [];

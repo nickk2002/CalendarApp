@@ -1,5 +1,5 @@
 import dateFormat from "dateformat";
-import {Time} from "./Time";
+import {Time} from "../business/Time";
 
 type HourMinutes = {
     minutes: number,

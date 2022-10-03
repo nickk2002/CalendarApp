@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, test} from '@jest/globals';
-import {prettyPrintDifferenceTime} from "../Utils";
+import {prettyPrintDifferenceTime} from "../src/utils/Utils";
 import {i18n} from "dateformat"
-import {Time} from "../Time";
+import {Time} from "../src/business/Time";
 
 function checkDateEqualsTime(date: Date, time: Time) {
     expect(date.getDate()).toBe(time.day);

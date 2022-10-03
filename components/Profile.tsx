@@ -1,9 +1,9 @@
 import {Pressable, StyleSheet, View} from "react-native";
 import React, {useState} from "react";
 import {MyText} from "./Ceva";
-import {themeHook, themeStorageKey} from "./global";
+import {themeHook, themeStorageKey} from "../src/global/global";
 import {Entypo, Ionicons} from "@expo/vector-icons";
-import {colors} from "../colors";
+import {colors} from "../src/global/colors";
 import {SafeAreaView} from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

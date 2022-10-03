@@ -1,6 +1,6 @@
 import GlobalStore from "react-native-global-state-hooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {Time} from "../Time";
+import {Time} from "../business/Time";
 
 export const tasksStorageKey = "TASKS"
 export const themeStorageKey = "Theme"

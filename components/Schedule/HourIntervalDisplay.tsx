@@ -1,7 +1,7 @@
 import {Text, View} from "react-native";
-import {colors} from "../../colors";
+import {colors} from "../../src/global/colors";
 import React from "react";
-import {Time} from "../../Time";
+import {Time} from "../../src/business/Time";
 
 export type TimeInterval = {
     startTime: Time,

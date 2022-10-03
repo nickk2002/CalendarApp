@@ -1,7 +1,7 @@
-import {themeHook} from "../global";
+import {themeHook} from "../../src/global/global";
 import {StyleSheet, TouchableOpacity, View} from "react-native";
 import {MyText} from "../Ceva";
-import {colors} from "../../colors";
+import {colors} from "../../src/global/colors";
 import React from "react";
 
 export default function EventTimeLabels(props: { value: string; label: string; onPress?: () => void; notPressable?: boolean }) {

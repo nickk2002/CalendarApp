@@ -1,9 +1,9 @@
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import React from "react";
-import {colors} from "../../colors";
+import {colors} from "../../src/global/colors";
 import HourIntervalDisplay from "./HourIntervalDisplay";
 import {MyText} from "../Ceva";
-import {themeHook} from "../global";
+import {themeHook} from "../../src/global/global";
 import {CalendarItemType} from "./CalendarItemType";
 
 function RenderLine(props: { color: string }) {

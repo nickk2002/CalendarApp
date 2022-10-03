@@ -1,6 +1,6 @@
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import {themeHook} from "./global";
-import {navigate} from "../RootNavigation";
+import {themeHook} from "../src/global/global";
+import {navigate} from "./RootNavigation";
 import {MyText} from "./Ceva";
 
 export default function NavigationBar() {

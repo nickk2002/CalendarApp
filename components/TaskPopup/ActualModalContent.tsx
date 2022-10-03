@@ -3,22 +3,22 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import dateFormat from "dateformat";
-import {dateFormatString, getHourDifference, prettyPrintDifferenceDate} from "../../Utils";
+import {dateFormatString, getHourDifference, prettyPrintDifferenceDate} from "../../src/utils/Utils";
 
 import {MyText} from "../Ceva";
 import React, {useEffect, useRef, useState} from "react";
-import {calendarDayHook, filteredTasksHook, storeTasksAsync, taskHook, themeHook} from "../global";
-import {colors} from "../../colors";
+import {calendarDayHook, filteredTasksHook, storeTasksAsync, taskHook, themeHook} from "../../src/global/global";
+import {colors} from "../../src/global/colors";
 import {PopupSettings} from "./Popup";
 import EventTimeLabels from "./EventTimeLabels";
 import EventOption from "./EventOptions";
 import ColorPicker, {randomColor} from "./ColorPicker";
 import {DeleteButton} from "./DeleteButton";
-import {navigateBack} from "../../RootNavigation";
+import {navigateBack} from "../RootNavigation";
 import FlashMessage from "react-native-flash-message";
 import clone from "just-clone";
 import {CalendarItemType} from "../Schedule/CalendarItemType";
-import {Time} from "../../Time";
+import {Time} from "../../src/business/Time";
 
 
 export default function ActualContent(props: PopupSettings) {

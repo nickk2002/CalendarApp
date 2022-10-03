@@ -1,6 +1,6 @@
 // noinspection JSObjectNullOrUndefined
 
-import {CalendarItemType} from "./components/Schedule/CalendarItemType";
+import {CalendarItemType} from "../../components/Schedule/CalendarItemType";
 import {Time} from "./Time";
 
 

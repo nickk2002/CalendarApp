@@ -1,5 +1,5 @@
 import {TimeInterval} from "./HourIntervalDisplay";
-import {Time} from "../../Time";
+import {Time} from "../../src/business/Time";
 
 export interface CalendarItemType extends TimeInterval {
     color?: string;

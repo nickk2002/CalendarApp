@@ -1,8 +1,8 @@
 import {Modal, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View} from "react-native";
-import {navigateBack} from "../RootNavigation";
-import {cuvinteHook, storeCuvinteAsync, themeHook} from "./global";
+import {navigateBack} from "./RootNavigation";
+import {cuvinteHook, storeCuvinteAsync, themeHook} from "../src/global/global";
 import {MyText, MyTextInput} from "./Ceva";
-import {colors} from "../colors";
+import {colors} from "../src/global/colors";
 
 
 export default function WordModal({route}) {

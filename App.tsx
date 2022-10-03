@@ -11,11 +11,11 @@ import {
     tasksStorageKey,
     themeHook,
     themeStorageKey
-} from "./components/global";
+} from "./src/global/global";
 import Profile from "./components/Profile";
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
-import {navigationRef} from './RootNavigation';
+import {navigationRef} from './components/RootNavigation';
 import FlashMessage from "react-native-flash-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from 'expo-splash-screen';
@@ -26,7 +26,6 @@ import NavigationBar from "./components/NavigationBar";
 SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
 export default function App() {
-    const [readFromLocalStorage, setReadFromLocalStorage] = useState(false);
     const [theme] = themeHook();
     const [, setTasks] = taskHook();
     const [, setTheme] = themeHook();

@@ -5,7 +5,7 @@ import {
     getHourDifference,
     prettyPrintDayName,
 
-} from "../../Utils";
+} from "../../src/utils/Utils";
 
 import dateFormat from "dateformat";
 import CalendarItem from "./CalendarItem";
@@ -17,16 +17,16 @@ import {
     storeTasksAsync,
     taskHook,
     themeHook
-} from "../global";
-import {navigate} from "../../RootNavigation";
+} from "../../src/global/global";
+import {navigate} from "../RootNavigation";
 
 import {AntDesign, Ionicons} from '@expo/vector-icons';
 import React, {useEffect, useState} from "react";
-import {colors} from "../../colors";
+import {colors} from "../../src/global/colors";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import Slider from "@react-native-community/slider";
-import webRequest from "../TaskPopup/webRequestCalendar";
-import {Time} from "../../Time";
+import webRequest from "../../src/business/webRequestCalendar";
+import {Time} from "../../src/business/Time";
 
 const spaceBetween = 2;
 const initialTimeHour = 7;
