@@ -122,7 +122,6 @@ export function getTodayWithThisHourMinutes(hour: number, minutes: number): Time
 export function compareTime(time1: Time, time2: Time) {
     return time1.day === time2.day && time1.hour == time2.hour
         && time1.minutes == time2.minutes && time1.month == time2.month;
-
 }
 
 /*

@@ -24,10 +24,12 @@
 
 ### Features
 - [ ] Refresh calendar button with last refresh date
-- [ ] Do something with things that appear in calendar but I do not want to show them
+- [ ] Do something with things that appear in calendar but I do not want to show them => Store them in local storage as delete
 - [ ] Calendar View without free time
 - [ ] Task view for today
 - [ ] Add link to the building name
+- [ ] Add proper wait for the tasks to load
+- [ ] Add year computations too
 - [X] Exam fix names
 - [X] Wait for calendar to load in main screen
 - [X] Show location in task view
@@ -39,6 +41,7 @@
 - [ ] dark mode/light mode preference save in local storage
 - [X] Bug when creating a task at the end of the day it is not full width
 - [ ] Repeat functionality for events
+- [ ] Status bar flickers when changing theme
 - [X] Sa adaug alte rugaciuni scriind direct pe tel
 
 ### Code

@@ -1,6 +1,7 @@
 import {ScrollView, StyleSheet, Switch, TouchableOpacity, View} from "react-native";
 import {
     compareTime,
+    dateFormatString,
     formatHourTime,
     getDayMonth,
     getHourDifference,
@@ -11,9 +12,18 @@ import {
     Time
 } from "../../Utils";
 
+import dateFormat from "dateformat";
 import CalendarItem from "./CalendarItem";
 import {MyText} from "../Ceva";
-import {calendarDayHook, filteredTasksHook, taskHook, themeHook} from "../global";
+import {
+    calendarDayHook,
+    filteredTasksHook,
+    lastRefreshDateHook,
+    storeLastCalendarRefreshDate,
+    storeTasksAsync,
+    taskHook,
+    themeHook
+} from "../global";
 import {navigate} from "../../RootNavigation";
 
 import {AntDesign, Ionicons} from '@expo/vector-icons';
@@ -22,6 +32,7 @@ import clone from "just-clone";
 import {colors} from "../../colors";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import Slider from "@react-native-community/slider";
+import webRequest from "../TaskPopup/webRequestCalendar";
 
 const spaceBetween = 2;
 const initialTimeHour = 7;
@@ -32,12 +43,35 @@ export default function RenderSchedule({navigation}) {
     const [theme] = themeHook();
     const [givenTasks] = taskHook();
     const [currentDate, setCurrentDate] = calendarDayHook();
-    const [tasks, setFilteredTasks] = filteredTasksHook();
+    const [tasks, setFilteredTasks] = useState([]);
+    const [lastRefreshDate] = lastRefreshDateHook();
 
     const [visiblePickDate, setVisiblePickDate] = useState(false);
     const [isUsingFreeTime, setIsUsingFreeTime] = useState(false);
-    const [taskHeight,setTaskHeight] = useState(120);
+    const [taskHeight, setTaskHeight] = useState(120);
 
+    const [, setTasks] = taskHook();
+    const [, setLastRefreshDate] = lastRefreshDateHook();
+    const [doingRequest, setIsDoingRequest] = useState(false);
+
+    function loadCalendar(parsedTasks) {
+        if (doingRequest)
+            return;
+        setIsDoingRequest(true);
+        webRequest(parsedTasks, () => {
+            setIsDoingRequest(false);
+            setLastRefreshDate(new Date());
+            storeLastCalendarRefreshDate(Date());
+        }, (newTasks) => {
+            console.log("New tasks!");
+            setTasks(newTasks);
+            storeTasksAsync(newTasks);
+        }, () => {
+            setIsDoingRequest(false);
+        })
+    }
+
+    useEffect(() => loadCalendar(tasks), []);
     const sortAndFilterTasks = () => {
         const filtered = givenTasks.filter((task) =>
             task.startTime.month === currentDate.month && currentDate.day === task.startTime.day
@@ -50,7 +84,7 @@ export default function RenderSchedule({navigation}) {
                 return 0;
             return 1;
         });
-        console.log("Given tasks", givenTasks.length);
+        console.log("Filtered tasks tasks", filtered.length,"Total",givenTasks.length);
         setFilteredTasks(filtered);
     }
     useEffect(sortAndFilterTasks, [givenTasks, currentDate]);
@@ -68,7 +102,6 @@ export default function RenderSchedule({navigation}) {
         for (const task of tasks) {
             if (!compareTime(previousHour, task.startTime) && isUsingFreeTime) {
                 const hourCloned = clone(previousHour);
-
                 toRender.push(
                     <View key={previousHour.minutes + previousHour.hour * 60}
                           style={{
@@ -123,7 +156,7 @@ export default function RenderSchedule({navigation}) {
     }
 
     function renderTime() {
-        if(!isUsingFreeTime)
+        if (!isUsingFreeTime)
             return;
         const timestamps = [];
         const hours: Time[] = [getTimeWithThisHour(currentDate, initialTimeHour)];
@@ -140,11 +173,10 @@ export default function RenderSchedule({navigation}) {
             timestamps.push(
                 <View key={hour.hour * 60 + hour.minutes}
                       style={{flexDirection: "column", height: taskHeight * getHourDifference(hour, nextHour)}}>
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "center"
-                        }}>
+                    <View style={{
+                        flexDirection: "row",
+                        alignItems: "center"
+                    }}>
                         <MyText style={styles.time}>{formatHourTime(hour)} </MyText>
                         <View style={{width: 10, height: 1, backgroundColor: colors.textgrey}}/>
                     </View>
@@ -168,20 +200,6 @@ export default function RenderSchedule({navigation}) {
         return (
             <View style={{marginRight: 5, marginTop: -10}}>
                 {timestamps}
-                {/*<View style={{*/}
-                {/*    flexDirection: "column",*/}
-                {/*    position: "absolute",*/}
-                {/*    top: timeHeight * getHourDifference(getTodayWithThisHour(initialTimeHour), currentHour)*/}
-                {/*}}>*/}
-                {/*    <View*/}
-                {/*        style={{*/}
-                {/*            flexDirection: "row",*/}
-                {/*            alignItems: "center"*/}
-                {/*        }}>*/}
-                {/*        <MyText style={[styles.time, {color: colors.red}]}>{formatHourTime(currentHour)} </MyText>*/}
-                {/*        <View style={{width: 10, height: 1.2, backgroundColor: colors.red}}/>*/}
-                {/*    </View>*/}
-                {/*</View>*/}
             </View>
         );
     }
@@ -224,8 +242,12 @@ export default function RenderSchedule({navigation}) {
                     <AntDesign name="arrowright" size={24} color={theme == 'white' ? 'black' : colors.textgrey}/>
                 </TouchableOpacity>
             </View>
-            <View style={{flexDirection:'row'}}>
-                <View style={{flexDirection:'column',marginRight:20}}>
+            <TouchableOpacity onPress={() => loadCalendar(tasks)}>
+                <MyText style={{width: '100%', borderWidth: 1, textAlign: 'center'}}> Refreshed
+                    at {dateFormat(lastRefreshDate, dateFormatString)} </MyText>
+            </TouchableOpacity>
+            <View style={{flexDirection: 'row'}}>
+                <View style={{flexDirection: 'column', marginRight: 20}}>
                     <MyText style={{fontSize: 15, fontWeight: 'bold'}}>Show free time</MyText>
                     <Switch style={{alignSelf: 'flex-start'}}
                             trackColor={{false: "#767577", true: "#81b0ff"}}
@@ -238,14 +260,14 @@ export default function RenderSchedule({navigation}) {
                 <View>
                     <MyText style={{fontSize: 15, fontWeight: 'bold'}}>Task Height</MyText>
                     <Slider
-                        style={{marginLeft:0,width: 150, height: 40,transform:[{scaleY:1.2},{scaleX:1.2}]}}
+                        style={{marginLeft: 0, width: 150, height: 40, transform: [{scaleY: 1.2}, {scaleX: 1.2}]}}
                         minimumValue={60}
                         maximumValue={200}
-                        onValueChange={(value)=>setTaskHeight(value)}
+                        onValueChange={(value) => setTaskHeight(value)}
                         step={10}
                         tapToSeek
-                        minimumTrackTintColor={theme == 'white'? "#033ebc": "#033ebc"}
-                        maximumTrackTintColor={theme == 'white'?"#000000":"#FFFFFF"}
+                        minimumTrackTintColor={theme == 'white' ? "#033ebc" : "#033ebc"}
+                        maximumTrackTintColor={theme == 'white' ? "#000000" : "#FFFFFF"}
                     />
                 </View>
             </View>
@@ -258,12 +280,7 @@ export default function RenderSchedule({navigation}) {
                         </View>
                     </View>
                     :
-                    <View style={{
-                        height: '100%',
-                        width: '100%',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}>
+                    <View style={styles.flexcentered}>
                         <MyText style={{fontSize: 20}}>No Tasks Today!</MyText>
                         <Ionicons style={{marginTop: 10}} name="ios-checkmark-sharp" size={32}
                                   color={theme == 'white' ? 'black' : 'grey'}/>
@@ -282,4 +299,10 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#A1A1A1',
     },
+    flexcentered: {
+        height: '100%',
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center'
+    }
 });
