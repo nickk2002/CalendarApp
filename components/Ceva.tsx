@@ -16,10 +16,6 @@ import {navigate} from "../RootNavigation";
 
 function Header(props: { text?, placeholder?, onChangeText? }) {
     return <MyText style={{fontWeight: "bold", fontSize: 19}}>{props.text}</MyText>
-    if (props.text)
-        return <MyTextInput
-            style={{fontWeight: "bold", fontSize: 19}}>{props.text}</MyTextInput>
-    return <MyTextInput placeholder={props.placeholder} style={{fontWeight: "bold", fontSize: 19}}/>
 }
 
 export interface Showable {
@@ -57,7 +53,7 @@ export function MyTextInput(props: MyTextInputProps) {
     if ('show' in props && !props.show)
         return <></>
     if (props.children)
-        return <TextInput scrollEnabled {...props}  multiline
+        return <TextInput scrollEnabled {...props} multiline
                           placeholderTextColor={backgroundColorPlaceHolder()}
                           style={[{color: defaultColor}, props.style]}>{props.children}</TextInput>
     return <TextInput scrollEnabled  {...props} multiline
@@ -149,7 +145,7 @@ export default function Dumnezeu() {
     }
 
     return (
-        <ScrollView style={{marginRight: 10, marginLeft: 10, marginTop: 10}} snapToEnd>
+        <ScrollView style={{marginRight: 10, marginLeft: 10, marginTop: 10, flex: 1}}>
             <View style={styles.rugaciunea}>
                 <MyText style={{fontSize: 16}}><MyText style={{fontWeight: "bold"}}>Doamne, </MyText>Iisuse Hristoase,
                     Fiul
@@ -157,47 +153,59 @@ export default function Dumnezeu() {
                 <MyText style={{textAlignVertical: "center", marginTop: 10, opacity: 0.7}}>Spune mereu, cu frica si cu
                     dragoste</MyText>
             </View>
-            <View style={{flexDirection: "row", flex: 1,}}>
-                <View style={styles.explicatie}>
-                    <MyText style={{fontWeight: "bold"}}>Incredere</MyText>
-                    <MyText parseText>Am incredere in Tine Domane. Orice s-ar intampla Tu stii totul deci este bine
-                        pentru mine. Nu ma voi teme de nimic si orice necaz si suferinta as avea Iti multumesc Tie.Acest
-                        dar al increderii ma face sa nu imi mai fie frica de moarte si sa fiu gata in orice secunda
-                        pentru ea. Si daca se prabuseste avionul si ajung in mare si daca facem accident de masina si
-                        daca nu am unde sa stau,si daca cineva imi spune un cuvant urat, toate le primesc cu drag ca de
-                        la Tine, Dumnezeul meu. Doamne, in Tine imi pun toata nadejdea si speranta pe care o am si stiu
-                        ca nu ma vei rusina. Dovada sunt toate minunile pe care le-ai facut cu Mine, si recunosc ca sunt
-                        cu adevarat nevrednic de ele. </MyText>
-                </View>
-                <View style={styles.explicatie}>
-                    <MyText style={{fontWeight: "bold"}}>Smerenie</MyText>
-                    <MyText parseText>Fii atent la cuvantul _"pacatos"_ pe care il spui. Gandeste-te de cate ori ai
-                        judecat
-                        pe
-                        ceilalti si de cate ori te-ai simtit foarte departe de Dumnezeu. Aminteste-ti de noaptea in care
-                        nu
-                        puteai sa dormi pentru ca simteai ca ai demon in tine. Aminteste-ti ca ai citit de doua ori
-                        despre
-                        slava desarta si despre faptul ca te mandresti ca faci fapte ale credintei in exterior si judeci
-                        pe
-                        ceilalti. *Nebunule!, pentru ce vezi paiul din ochiul ceiluilalt si nu vezi cat de mandru esti
-                        in
-                        tot cea ce faci.Oare ce te poti mandri daca intr-o secunda Dumnezeu poate sa iti ia tot? Oare nu
-                        ai
-                        primit de la Dumnezeu fiecare lucru? Oare nu era sa te sinucizi si Dumnezeu te-a salvat? Pe
-                        astea le
-                        uiti dar cand cineva vorbeste despre masini sau despre case ti se pare pacat.* Cu toate aceste
-                        rele
-                        pe care le faci si continui sa le faci Dumnezeu nu te trimite in iad. Si inca mai mult de atat,
-                        iti
-                        da o sansa in fiecare zi sa te indrepti, sa ai timp de rugaciune. Doamne, ai mila de mine ca
-                        pacatos
-                        sunt. Miluieste-ma asa cum Poti. </MyText>
-                </View>
-            </View>
+            {/*<ScrollView>*/}
 
+                <View style={{flexDirection: "row", flex: 1,}}>
+                    <View style={styles.explicatie}>
+                        <MyText style={{fontWeight: "bold"}}>Incredere</MyText>
+                        <MyText parseText>Am incredere in Tine Domane. Orice s-ar intampla Tu stii totul deci este bine
+                            pentru mine. Nu ma voi teme de nimic si orice necaz si suferinta as avea Iti multumesc
+                            Tie.Acest
+                            dar al increderii ma face sa nu imi mai fie frica de moarte si sa fiu gata in orice secunda
+                            pentru ea. Si daca se prabuseste avionul si ajung in mare si daca facem accident de masina
+                            si
+                            daca nu am unde sa stau,si daca cineva imi spune un cuvant urat, toate le primesc cu drag ca
+                            de
+                            la Tine, Dumnezeul meu. Doamne, in Tine imi pun toata nadejdea si speranta pe care o am si
+                            stiu
+                            ca nu ma vei rusina. Dovada sunt toate minunile pe care le-ai facut cu Mine, si recunosc ca
+                            sunt
+                            cu adevarat nevrednic de ele. </MyText>
+                    </View>
+                    <View style={styles.explicatie}>
+                        <MyText style={{fontWeight: "bold"}}>Smerenie</MyText>
+                        <MyText parseText>Fii atent la cuvantul _"pacatos"_ pe care il spui. Gandeste-te de cate ori ai
+                            judecat
+                            pe
+                            ceilalti si de cate ori te-ai simtit foarte departe de Dumnezeu. Aminteste-ti de noaptea in
+                            care
+                            nu
+                            puteai sa dormi pentru ca simteai ca ai demon in tine. Aminteste-ti ca ai citit de doua ori
+                            despre
+                            slava desarta si despre faptul ca te mandresti ca faci fapte ale credintei in exterior si
+                            judeci
+                            pe
+                            ceilalti. *Nebunule!, pentru ce vezi paiul din ochiul ceiluilalt si nu vezi cat de mandru
+                            esti
+                            in
+                            tot cea ce faci.Oare ce te poti mandri daca intr-o secunda Dumnezeu poate sa iti ia tot?
+                            Oare nu
+                            ai
+                            primit de la Dumnezeu fiecare lucru? Oare nu era sa te sinucizi si Dumnezeu te-a salvat? Pe
+                            astea le
+                            uiti dar cand cineva vorbeste despre masini sau despre case ti se pare pacat.* Cu toate
+                            aceste
+                            rele
+                            pe care le faci si continui sa le faci Dumnezeu nu te trimite in iad. Si inca mai mult de
+                            atat,
+                            iti
+                            da o sansa in fiecare zi sa te indrepti, sa ai timp de rugaciune. Doamne, ai mila de mine ca
+                            pacatos
+                            sunt. Miluieste-ma asa cum Poti. </MyText>
+                    </View>
+                </View>
             <View style={{width: '100%', height: 1, marginVertical: 20, backgroundColor: 'grey'}}/>
-            <View style={{flex: 1,}}>
+            <View style={{flex: 1}}>
                 {cuvinte.map((item, index) =>
                     <Cuvant key={item.header + " " + item.text} index={index} header={item.header}
                             text={item.text}/>)
